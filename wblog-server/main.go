@@ -78,7 +78,8 @@ func setTemplate(engine *gin.Engine) {
 	}
 
 	engine.SetFuncMap(funcMap)
-	engine.LoadHTMLGlob(filepath.Join(getCurrentDirectory(), "../views/**/*"))
+	//engine.LoadHTMLGlob(filepath.Join(getCurrentDirectory(), "../views/**/*"))
+	engine.LoadHTMLFiles("./views/index.html")
 }
 
 //setSessions initializes sessions & csrf middlewares
