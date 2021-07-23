@@ -25,3 +25,5 @@ request.token
 dockerfile
 go.sum
 *.log
+
+tmp
