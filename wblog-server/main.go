@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"github.com/claudiu/gocron"
+	"github.com/gin-contrib/sessions"
 	"html/template"
 	"net/http"
 
@@ -11,8 +13,6 @@ import (
 	"strings"
 
 	"github.com/cihub/seelog"
-	"github.com/claudiu/gocron"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"wblog/controllers"
 	"wblog/helpers"
@@ -45,20 +45,20 @@ func main() {
 		return
 	}
 	defer db.Close()
-
-	gin.SetMode(gin.ReleaseMode)
+	//设置模式
+	//gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 
-	setTemplate(router)
-	setSessions(router)
-	router.Use(SharedData())
-
+	//setSessions(router)
+	//router.Use(SharedData())
+	router.Static("/static", filepath.Join(getCurrentDirectory(), "./static"))
 	//Periodic tasks
+
+	setTemplate(router)
+
 	gocron.Every(1).Day().Do(controllers.CreateXMLSitemap)
 	gocron.Every(7).Days().Do(controllers.Backup)
 	gocron.Start()
-
-	router.Static("/static", filepath.Join(getCurrentDirectory(), "./static"))
 	InitRoute(router)
 
 	router.Run(system.GetConfiguration().Addr)
@@ -78,8 +78,7 @@ func setTemplate(engine *gin.Engine) {
 	}
 
 	engine.SetFuncMap(funcMap)
-	//engine.LoadHTMLGlob(filepath.Join(getCurrentDirectory(), "../views/**/*"))
-	engine.LoadHTMLFiles("./views/index.html")
+	engine.LoadHTMLGlob(filepath.Join(getCurrentDirectory(), "../views/**/*"))
 }
 
 //setSessions initializes sessions & csrf middlewares

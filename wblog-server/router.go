@@ -7,7 +7,7 @@ import (
 )
 
 func InitRoute(router *gin.Engine) {
-	router.NoRoute(controllers.Handle404)
+	//router.NoRoute(controllers.Handle404)
 	router.GET("/", controllers.IndexGet)
 	router.GET("/index", controllers.IndexGet)
 	router.GET("/rss", controllers.RssGet)
