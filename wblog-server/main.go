@@ -39,22 +39,19 @@ func main() {
 		return
 	}
 
-	db, err := models.InitDB()
+	//db, err := models.InitDB()
 	if err != nil {
 		seelog.Critical("err open databases", err)
 		return
 	}
-	defer db.Close()
 	//设置模式
 	//gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 
-	//setSessions(router)
 	//router.Use(SharedData())
-	router.Static("/static", "./static")
-	//Periodic tasks
+	//router.Static("/static", "./static")
 
-	setTemplate(router)
+	//setTemplate(router)
 
 	gocron.Every(1).Day().Do(controllers.CreateXMLSitemap)
 	gocron.Every(7).Days().Do(controllers.Backup)

@@ -77,13 +77,11 @@ func SignupPost(c *gin.Context) {
 		res = gin.H{}
 	)
 	defer writeJSON(c, res)
-	var user models.User
-	if c.ShouldBind(&user) == nil {
+	var user *models.User
+	if c.ShouldBindJSON(&user) == nil {
 		color.Redln("绑定user失败")
 	}
 
-	fmt.Println("abaddfdsdsff")
-	fmt.Println(user)
 	if len(user.Email) == 0 || len(user.Password) == 0 {
 		res["message"] = "email or password cannot be null"
 		return
@@ -91,7 +89,7 @@ func SignupPost(c *gin.Context) {
 	user.Password = helpers.Md5(user.Email + user.Password)
 	err = user.Insert()
 	if err != nil {
-		res["message"] = "email already exists"
+		res["message"] = "创建失败"
 		return
 	}
 	res["succeed"] = true

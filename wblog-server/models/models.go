@@ -12,7 +12,6 @@ import (
 	//_ "github.com/go-sql-driver/mysql"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/russross/blackfriday"
-	"wblog/system"
 )
 
 // I don't need soft delete,so I use customized BaseModel instead gorm.Model
@@ -130,7 +129,7 @@ type SmmsFile struct {
 
 var DB *gorm.DB
 
-func InitDB() (*gorm.DB, error) {
+func init() {
 	db, err := gorm.Open(sqlite.Open("wblog.db"), &gorm.Config{})
 	//db, err := gorm.Open("sqlite3", system.GetConfiguration().DSN)
 	//db, err := gorm.Open("mysql", "root:mysql@/wblog?charset=utf8&parseTime=True&loc=Asia/Shanghai")
@@ -139,9 +138,9 @@ func InitDB() (*gorm.DB, error) {
 		//db.LogMode(true)
 		db.AutoMigrate(&Page{}, &Post{}, &Tag{}, &PostTag{}, &User{}, &Comment{}, &Subscriber{}, &Link{}, &SmmsFile{})
 		//db.Model(&PostTag{}).AddUniqueIndex("uk_post_tag", "post_id", "tag_id")
-		return db, err
+
 	}
-	return nil, err
+
 }
 
 // Insert Page 插入数据u
@@ -196,8 +195,8 @@ func _listPage(published bool) ([]*Page, error) {
 	return pages, err
 }
 
-func CountPage() int {
-	var count int
+func CountPage() int64 {
+	var count int64
 	DB.Model(&Page{}).Count(&count)
 	return count
 }
@@ -334,8 +333,8 @@ func CountPostByTag(tag string) (count int, err error) {
 	return
 }
 
-func CountPost() int {
-	var count int
+func CountPost() int64 {
+	var count int64
 	DB.Model(&Post{}).Count(&count)
 	return count
 }
@@ -463,8 +462,8 @@ func ListTagByPostId(id string) ([]*Tag, error) {
 	return tags, nil
 }
 
-func CountTag() int {
-	var count int
+func CountTag() int64 {
+	var count int64
 	DB.Model(&Tag{}).Count(&count)
 	return count
 }
@@ -487,10 +486,11 @@ func DeletePostTagByPostId(postId uint) error {
 // user
 // insert user
 func (user *User) Insert() error {
-	return DB.Create(user).Error
+	fmt.Println(user)
+	return DB.Create(&user).Error
 }
 
-// update user
+// Update update user
 func (user *User) Update() error {
 	return DB.Save(user).Error
 }
@@ -521,7 +521,7 @@ func GetUser(id interface{}) (*User, error) {
 }
 
 func (user *User) UpdateProfile(avatarUrl, nickName string) error {
-	return DB.Model(user).Update(User{AvatarUrl: avatarUrl, NickName: nickName}).Error
+	return DB.Model(user).Updates(User{AvatarUrl: avatarUrl, NickName: nickName}).Error
 }
 
 func (user *User) UpdateEmail(email string) error {
@@ -539,7 +539,7 @@ func (user *User) UpdateGithubUserInfo() error {
 	} else {
 		githubLoginId = user.GithubLoginId
 	}
-	return DB.Model(user).Update(map[string]interface{}{
+	return DB.Model(user).Updates(map[string]interface{}{
 		"github_login_id": githubLoginId,
 		"avatar_url":      user.AvatarUrl,
 		"github_url":      user.GithubUrl,
@@ -547,7 +547,7 @@ func (user *User) UpdateGithubUserInfo() error {
 }
 
 func (user *User) Lock() error {
-	return DB.Model(user).Update(map[string]interface{}{
+	return DB.Model(user).Updates(map[string]interface{}{
 		"lock_state": user.LockState,
 	}).Error
 }
@@ -611,8 +611,8 @@ func ListCommentByPostID(postId string) ([]*Comment, error) {
 	return &comment, err
 }*/
 
-func CountComment() int {
-	var count int
+func CountComment() int64 {
+	var count int64
 	DB.Model(&Comment{}).Count(&count)
 	return count
 }
@@ -623,7 +623,7 @@ func (s *Subscriber) Insert() error {
 }
 
 func (s *Subscriber) Update() error {
-	return DB.Model(s).Update(map[string]interface{}{
+	return DB.Model(s).Updates(map[string]interface{}{
 		"verify_state":    s.VerifyState,
 		"subscribe_state": s.SubscribeState,
 		"out_time":        s.OutTime,
@@ -642,8 +642,8 @@ func ListSubscriber(invalid bool) ([]*Subscriber, error) {
 	return subscribers, err
 }
 
-func CountSubscriber() (int, error) {
-	var count int
+func CountSubscriber() (int64, error) {
+	var count int64
 	err := DB.Model(&Subscriber{}).Where("verify_state = ? and subscribe_state = ?", true, true).Count(&count).Error
 	return count, err
 }
