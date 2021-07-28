@@ -3,10 +3,12 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/golang-jwt/jwt"
 	"github.com/gookit/color"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/alimoeeny/gooauth2"
 	"github.com/cihub/seelog"
@@ -17,6 +19,13 @@ import (
 	"wblog/models"
 	"wblog/system"
 )
+
+type NewJwtClaims struct {
+	*models.User
+	jwt.StandardClaims
+}
+
+var SecretKey = []byte("9hUxqaGelNnCZaCW")
 
 type GithubUserInfo struct {
 	AvatarURL         string      `json:"avatar_url"`
@@ -77,9 +86,11 @@ func SignupPost(c *gin.Context) {
 		res = gin.H{}
 	)
 	defer writeJSON(c, res)
-	var user *models.User
-	if c.ShouldBindJSON(&user) == nil {
+	var user = models.User{}
+	if err1 := c.ShouldBind(&user); err1 != nil {
+		color.Redln(user)
 		color.Redln("绑定user失败")
+
 	}
 
 	if len(user.Email) == 0 || len(user.Password) == 0 {
@@ -96,17 +107,31 @@ func SignupPost(c *gin.Context) {
 }
 
 func SigninPost(c *gin.Context) {
+	type SignIn struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	result := &models.Result{
+		Code:    200,
+		Message: "登录成功n",
+		Data:    nil,
+	}
 	var (
-		err  error
-		user *models.User
+		err    error
+		user   *models.User
+		signin SignIn
 	)
-	username := c.PostForm("username")
-	password := c.PostForm("password")
+	if c.ShouldBind(&signin) != nil {
+		color.Redln("绑定signin失败")
+	}
+
+	username := signin.Username
+	password := signin.Password
 	color.Redln("html登录了")
 	fmt.Print(username)
 	fmt.Println(password)
 	if username == "" || password == "" {
-		c.HTML(http.StatusOK, "auth/signin.html", gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message": "username or password cannot be null",
 		})
 		return
@@ -114,22 +139,61 @@ func SigninPost(c *gin.Context) {
 
 	user, err = models.GetUserByUsername(username)
 	if err != nil || user.Password != helpers.Md5(username+password) {
-		c.HTML(http.StatusOK, "auth/signin.html", gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message": "invalid username or password",
 		})
 		return
 	}
 	if user.LockState {
-		c.HTML(http.StatusOK, "auth/signin.html", gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message": "Your account have been locked",
 		})
 		return
 	}
 
 	if user.IsAdmin {
-		c.Redirect(http.StatusMovedPermanently, "/admin/index")
+		expiresTime := time.Now().Unix() + int64(60*60*24)
+		//claims := jwt.StandardClaims{
+		//	Audience:  user.Username,          // 受众
+		//	ExpiresAt: expiresTime,            // 失效时间
+		//	Id:        string(rune(user.Uid)), // 编号
+		//	IssuedAt:  time.Now().Unix(),      // 签发时间
+		//	Issuer:    sqlU.Username,            // 签发人
+		//	NotBefore: time.Now().Unix(),      // 生效时间
+		//	Subject:   "login",                // 主题
+		//}
+		stdClaims := jwt.StandardClaims{
+
+			Audience:  "啊啊啊",             // 受众
+			ExpiresAt: expiresTime,       // 失效时间
+			Id:        "id",              // 编号
+			IssuedAt:  time.Now().Unix(), // 签发时间
+			Issuer:    "sqlU.Username",   // 签发人
+			NotBefore: time.Now().Unix(), // 生效时间
+			Subject:   "login",           // 主题
+		}
+		newClaims := NewJwtClaims{
+			User:           user,
+			StandardClaims: stdClaims,
+		}
+		tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, newClaims)
+		if token, err := tokenClaims.SignedString(SecretKey); err == nil {
+			result.Message = "登录成功"
+			result.Data = token
+			result.Code = http.StatusOK
+			c.JSON(result.Code, result)
+		} else {
+			result.Message = "登录失败，请重新登陆"
+			result.Code = http.StatusOK
+			c.JSON(result.Code, gin.H{
+				"result": result,
+			})
+		}
+
 	} else {
-		c.Redirect(http.StatusMovedPermanently, "/")
+		c.JSON(http.StatusMovedPermanently, gin.H{
+			"err": "重定向",
+		})
 	}
 }
 
@@ -259,7 +323,7 @@ func getGithubUserInfoByAccessToken(token string) (*GithubUserInfo, error) {
 func ProfileGet(c *gin.Context) {
 	sessionUser, exists := c.Get(CONTEXT_USER_KEY)
 	if exists {
-		c.HTML(http.StatusOK, "admin/profile.html", gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"user":     sessionUser,
 			"comments": models.MustListUnreadComment(),
 		})

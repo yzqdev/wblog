@@ -70,7 +70,7 @@ type User struct {
 	IsAdmin       bool      //是否是管理员
 	AvatarUrl     string    // 头像链接
 	NickName      string    // 昵称
-	LockState     bool      `gorm:"default:'0'"` //锁定状态
+	LockState     bool      `gorm:"default:true"` //锁定状态
 }
 
 // table comments
@@ -86,7 +86,7 @@ type Comment struct {
 	GithubUrl string `gorm:"-"`
 }
 
-// table subscribe
+// Subscriber table subscribe
 type Subscriber struct {
 	gorm.Model
 	Email          string    `gorm:"unique_index"` //邮箱
