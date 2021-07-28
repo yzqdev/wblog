@@ -321,10 +321,13 @@ func getGithubUserInfoByAccessToken(token string) (*GithubUserInfo, error) {
 }
 
 func ProfileGet(c *gin.Context) {
-	sessionUser, exists := c.Get(CONTEXT_USER_KEY)
+	userCtx, exists := c.Get("user")
+	color.Redln(userCtx)
+	//查询用户组及该组的功能权限
+	user, _ := userCtx.(models.User)
 	if exists {
 		c.JSON(http.StatusOK, gin.H{
-			"user":     sessionUser,
+			"user":     user,
 			"comments": models.MustListUnreadComment(),
 		})
 	}

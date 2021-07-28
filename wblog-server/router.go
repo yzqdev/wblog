@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"wblog/controllers"
+	"wblog/middleware"
 	"wblog/system"
 )
 
@@ -46,8 +47,7 @@ func InitRoute(router *gin.Engine) {
 
 	router.GET("/link/:id", controllers.LinkGet)
 
-	authorized := router.Group("/admin")
-	authorized.Use(AdminScopeRequired())
+	authorized := router.Group("/admin", middleware.JwtHandler())
 	{
 		// index
 		authorized.GET("/index", controllers.AdminIndex)

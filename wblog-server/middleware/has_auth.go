@@ -6,6 +6,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/gookit/color"
 	"net/http"
+	"wblog/controllers"
 	"wblog/models"
 )
 
@@ -42,20 +43,20 @@ func JwtHandler() gin.HandlerFunc {
 	}
 }
 func parseToken(yourToken string) (models.User, error) {
-	claims := models.NewJwtClaims{}
+	claims := controllers.NewJwtClaims{}
 	_, err := jwt.ParseWithClaims(yourToken, &claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-		return controller.SecretKey, nil
+		return controllers.SecretKey, nil
 
 	})
 	if err != nil {
 		color.Danger.Println("token值为空")
 
 	}
-	color.Danger.Println(claims.AdminUser, "编译token")
-	return *claims.AdminUser, err
+	color.Danger.Println(claims.User, "编译token")
+	return *claims.User, err
 
 }

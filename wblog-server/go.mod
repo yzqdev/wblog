@@ -11,7 +11,7 @@ require (
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-yaml/yaml v2.1.0+incompatible
-	github.com/golang-jwt/jwt v3.2.1+incompatible // indirect
+	github.com/golang-jwt/jwt v3.2.1+incompatible
 	github.com/gookit/color v1.4.2
 	github.com/gorilla/feeds v1.1.1
 	github.com/kr/pretty v0.2.1 // indirect
