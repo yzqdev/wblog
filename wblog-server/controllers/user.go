@@ -50,6 +50,12 @@ type GithubUserInfo struct {
 	UpdatedAt         string      `json:"updated_at"`
 	URL               string      `json:"url"`
 }
+type SignInInfo struct {
+	Email     string `json:"email"`
+	Telephone string `json:"telephone"`
+	Password  string `json:"password"`
+	IsAdmin   bool   `json:"is_admin"`
+}
 
 func SigninGet(c *gin.Context) {
 	c.HTML(http.StatusOK, "auth/signin.html", nil)
@@ -60,27 +66,24 @@ func SignupGet(c *gin.Context) {
 }
 
 func LogoutGet(c *gin.Context) {
-	s := sessions.Default(c)
-	s.Clear()
-	s.Save()
+
 	c.Redirect(http.StatusSeeOther, "/signin")
 }
 
+// SignupPost 注册post
 func SignupPost(c *gin.Context) {
 	var (
 		err error
 		res = gin.H{}
 	)
 	defer writeJSON(c, res)
-	email := c.PostForm("email")
-	telephone := c.PostForm("telephone")
-	password := c.PostForm("password")
-	user := &models.User{
-		Email:     email,
-		Telephone: telephone,
-		Password:  password,
-		IsAdmin:   true,
+	var user models.User
+	if c.ShouldBind(&user) == nil {
+		color.Redln("绑定user失败")
 	}
+
+	fmt.Println("abaddfdsdsff")
+	fmt.Println(user)
 	if len(user.Email) == 0 || len(user.Password) == 0 {
 		res["message"] = "email or password cannot be null"
 		return
@@ -113,7 +116,6 @@ func SigninPost(c *gin.Context) {
 
 	user, err = models.GetUserByUsername(username)
 	if err != nil || user.Password != helpers.Md5(username+password) {
-		fmt.Println("ddddddd")
 		c.HTML(http.StatusOK, "auth/signin.html", gin.H{
 			"message": "invalid username or password",
 		})
@@ -125,10 +127,7 @@ func SigninPost(c *gin.Context) {
 		})
 		return
 	}
-	s := sessions.Default(c)
-	s.Clear()
-	s.Set(SESSION_KEY, user.ID)
-	s.Save()
+
 	if user.IsAdmin {
 		c.Redirect(http.StatusMovedPermanently, "/admin/index")
 	} else {
@@ -142,17 +141,17 @@ func Oauth2Callback(c *gin.Context) {
 		user     *models.User
 	)
 	code := c.Query("code")
-	state := c.Query("state")
-
-	// validate state
-	session := sessions.Default(c)
-	if len(state) == 0 || state != session.Get(SESSION_GITHUB_STATE) {
-		c.Abort()
-		return
-	}
+	//state := c.Query("state")
+	//
+	//// validate state
+	//session := sessions.Default(c)
+	//if len(state) == 0 || state != session.Get(SESSION_GITHUB_STATE) {
+	//	c.Abort()
+	//	return
+	//}
 	// remove state from session
-	session.Delete(SESSION_GITHUB_STATE)
-	session.Save()
+	//session.Delete(SESSION_GITHUB_STATE)
+	//session.Save()
 
 	// exchange accesstoken by code
 	token, err := exchangeTokenByCode(code)

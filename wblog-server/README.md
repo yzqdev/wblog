@@ -7,7 +7,7 @@
 
 ## 技术选型
 1. web:[gin](https://github.com/gin-gonic/gin)
-2. orm:[gorm](https://github.com/jinzhu/gorm)
+2. orm:[gorm](https://gorm.io/gorm)
 3. database:[sqlite3](https://github.com/mattn/go-sqlite3)
 4. ~~全文检索:[wukong](https://github.com/huichen/wukong)~~
 5. 文件存储:~~[七牛云存储](https://www.qiniu.com/)~~[smms图床](https://sm.ms)

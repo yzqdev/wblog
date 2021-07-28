@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/mattn/go-sqlite3"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 	//_ "github.com/go-sql-driver/mysql"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/russross/blackfriday"
@@ -22,7 +22,7 @@ type BaseModel struct {
 	UpdatedAt time.Time
 }
 
-// table pages
+// Page table pages
 type Page struct {
 	BaseModel
 	Title       string // title
@@ -131,20 +131,20 @@ type SmmsFile struct {
 var DB *gorm.DB
 
 func InitDB() (*gorm.DB, error) {
-
-	db, err := gorm.Open("sqlite3", system.GetConfiguration().DSN)
+	db, err := gorm.Open(sqlite.Open("wblog.db"), &gorm.Config{})
+	//db, err := gorm.Open("sqlite3", system.GetConfiguration().DSN)
 	//db, err := gorm.Open("mysql", "root:mysql@/wblog?charset=utf8&parseTime=True&loc=Asia/Shanghai")
 	if err == nil {
 		DB = db
 		//db.LogMode(true)
 		db.AutoMigrate(&Page{}, &Post{}, &Tag{}, &PostTag{}, &User{}, &Comment{}, &Subscriber{}, &Link{}, &SmmsFile{})
-		db.Model(&PostTag{}).AddUniqueIndex("uk_post_tag", "post_id", "tag_id")
+		//db.Model(&PostTag{}).AddUniqueIndex("uk_post_tag", "post_id", "tag_id")
 		return db, err
 	}
 	return nil, err
 }
 
-// Page
+// Insert Page 插入数据u
 func (page *Page) Insert() error {
 	return DB.Create(page).Error
 }

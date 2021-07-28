@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -44,9 +43,8 @@ func IndexGet(c *gin.Context) {
 		post.Tags, _ = models.ListTagByPostId(strconv.FormatUint(uint64(post.ID), 10))
 		post.Body = policy.Sanitize(string(blackfriday.MarkdownCommon([]byte(post.Body))))
 	}
-	fmt.Println("到达了indexconroller")
 	user, _ := c.Get(CONTEXT_USER_KEY)
-	c.HTML(http.StatusOK, "index/index.html", gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"posts":           posts,
 		"tags":            models.MustListTag(),
 		"archives":        models.MustListPostArchives(),

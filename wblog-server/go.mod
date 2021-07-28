@@ -13,12 +13,12 @@ require (
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/gookit/color v1.4.2
 	github.com/gorilla/feeds v1.1.1
-	github.com/jinzhu/gorm v1.9.16
 	github.com/kr/pretty v0.2.1 // indirect
-	github.com/mattn/go-sqlite3 v1.14.8
 	github.com/microcosm-cc/bluemonday v1.0.15
 	github.com/pkg/errors v0.9.1
 	github.com/qiniu/go-sdk/v7 v7.9.7
 	github.com/russross/blackfriday v1.6.0
 	github.com/snluu/uuid v0.0.0-20130306162636-1dd34a9ad6c0
+	gorm.io/driver/sqlite v1.1.4
+	gorm.io/gorm v1.21.12
 )
