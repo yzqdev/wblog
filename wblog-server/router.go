@@ -14,12 +14,10 @@ func InitRoute(router *gin.Engine) {
 	router.GET("/rss", controllers.RssGet)
 
 	if system.GetConfiguration().SignupEnabled {
-		router.GET("/signup", controllers.SignupGet)
 		router.POST("/signup", controllers.SignupPost)
 	}
 	// user signin and logout
-	router.GET("/signin", controllers.SigninGet)
-	router.POST("/signin", controllers.SigninPost)
+	router.POST("/signin", controllers.Login)
 	router.GET("/logout", controllers.LogoutGet)
 	router.GET("/oauth2callback", controllers.Oauth2Callback)
 	router.GET("/auth/:authType", controllers.AuthGet)

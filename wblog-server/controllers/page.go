@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"wblog/utils"
 
 	"github.com/gin-gonic/gin"
 	"wblog/models"
@@ -17,7 +18,7 @@ func PageGet(c *gin.Context) {
 	}
 	page.View++
 	page.UpdateView()
-	c.HTML(http.StatusOK, "page/display.html", gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"page": page,
 	})
 }
@@ -125,7 +126,7 @@ func PageDelete(c *gin.Context) {
 func PageIndex(c *gin.Context) {
 	pages, _ := models.ListAllPage()
 	user, _ := c.Get(CONTEXT_USER_KEY)
-	c.HTML(http.StatusOK, "admin/page.html", gin.H{
+	utils.JSON(c, 200, "success", gin.H{
 		"pages":    pages,
 		"user":     user,
 		"comments": models.MustListUnreadComment(),

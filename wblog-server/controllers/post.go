@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"wblog/utils"
 
 	"github.com/gin-gonic/gin"
 	"wblog/models"
@@ -21,7 +22,7 @@ func PostGet(c *gin.Context) {
 	post.Tags, _ = models.ListTagByPostId(id)
 	post.Comments, _ = models.ListCommentByPostID(id)
 	user, _ := c.Get(CONTEXT_USER_KEY)
-	c.HTML(http.StatusOK, "post/display.html", gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"post": post,
 		"user": user,
 	})
@@ -179,7 +180,7 @@ func PostDelete(c *gin.Context) {
 func PostIndex(c *gin.Context) {
 	posts, _ := models.ListAllPost("")
 	user, _ := c.Get(CONTEXT_USER_KEY)
-	c.HTML(http.StatusOK, "admin/post.html", gin.H{
+	utils.JSON(c, 200, "success", gin.H{
 		"posts":    posts,
 		"Active":   "posts",
 		"user":     user,

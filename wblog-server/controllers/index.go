@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"wblog/utils"
 
 	"math"
 
@@ -60,12 +61,10 @@ func IndexGet(c *gin.Context) {
 
 func AdminIndex(c *gin.Context) {
 	user, _ := c.Get(CONTEXT_USER_KEY)
-	c.HTML(http.StatusOK, "admin/index.html", gin.H{
-		"pageCount":    models.CountPage(),
+	utils.JSON(c, 200, "hello", gin.H{"pageCount": models.CountPage(),
 		"postCount":    models.CountPost(),
 		"tagCount":     models.CountTag(),
 		"commentCount": models.CountComment(),
 		"user":         user,
-		"comments":     models.MustListUnreadComment(),
-	})
+		"comments":     models.MustListUnreadComment()})
 }

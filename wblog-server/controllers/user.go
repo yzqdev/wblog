@@ -66,19 +66,6 @@ type SignInInfo struct {
 	IsAdmin   bool   `json:"is_admin"`
 }
 
-func SigninGet(c *gin.Context) {
-	c.HTML(http.StatusOK, "auth/signin.html", nil)
-}
-
-func SignupGet(c *gin.Context) {
-	c.HTML(http.StatusOK, "auth/signup.html", nil)
-}
-
-func LogoutGet(c *gin.Context) {
-
-	c.Redirect(http.StatusSeeOther, "/signin")
-}
-
 // SignupPost 注册post
 func SignupPost(c *gin.Context) {
 	var (
@@ -105,8 +92,10 @@ func SignupPost(c *gin.Context) {
 	}
 	res["succeed"] = true
 }
-
-func SigninPost(c *gin.Context) {
+func LogoutGet(c *gin.Context) {
+	c.JSON(202, gin.H{"error": "失败了"})
+}
+func Login(c *gin.Context) {
 	type SignIn struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
