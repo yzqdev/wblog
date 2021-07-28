@@ -24,14 +24,14 @@ type Page struct {
 	IsPublished bool   // published or not
 }
 
-// table post_tags
+// PostTag table post_tags
 type PostTag struct {
 	BaseModel
 	PostId uint // post id
 	TagId  uint // tag id
 }
 
-// query result
+// QrArchive query result
 type QrArchive struct {
 	ArchiveDate time.Time //month
 	Total       int       //total
