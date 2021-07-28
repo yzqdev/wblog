@@ -51,7 +51,7 @@ func main() {
 
 	//setSessions(router)
 	//router.Use(SharedData())
-	router.Static("/static", filepath.Join(getCurrentDirectory(), "./static"))
+	router.Static("/static", "./static")
 	//Periodic tasks
 
 	setTemplate(router)
@@ -78,7 +78,7 @@ func setTemplate(engine *gin.Engine) {
 	}
 
 	engine.SetFuncMap(funcMap)
-	engine.LoadHTMLGlob(filepath.Join(getCurrentDirectory(), "../views/**/*"))
+	engine.LoadHTMLGlob("./views/**/*")
 }
 
 //setSessions initializes sessions & csrf middlewares
