@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gookit/color"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -100,14 +101,19 @@ func SigninPost(c *gin.Context) {
 	)
 	username := c.PostForm("username")
 	password := c.PostForm("password")
+	color.Redln("html登录了")
+	fmt.Print(username)
+	fmt.Println(password)
 	if username == "" || password == "" {
 		c.HTML(http.StatusOK, "auth/signin.html", gin.H{
 			"message": "username or password cannot be null",
 		})
 		return
 	}
+
 	user, err = models.GetUserByUsername(username)
 	if err != nil || user.Password != helpers.Md5(username+password) {
+		fmt.Println("ddddddd")
 		c.HTML(http.StatusOK, "auth/signin.html", gin.H{
 			"message": "invalid username or password",
 		})
