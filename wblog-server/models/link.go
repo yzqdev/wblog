@@ -2,7 +2,7 @@ package models
 
 import "gorm.io/gorm"
 
-// table link
+// Link table link
 type Link struct {
 	gorm.Model
 	Name string //名称
@@ -11,7 +11,7 @@ type Link struct {
 	View int    //访问次数
 }
 
-// Link
+// Insert Link
 func (link *Link) Insert() error {
 	return DB.FirstOrCreate(link, "url = ?", link.Url).Error
 }

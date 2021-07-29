@@ -2,14 +2,14 @@ package models
 
 import "strconv"
 
-// table tags
+// Tag table tags
 type Tag struct {
 	BaseModel
 	Name  string // tag name
 	Total int    `gorm:"-"` // count of post
 }
 
-// Tag
+// Insert Tag
 func (tag *Tag) Insert() error {
 	return DB.FirstOrCreate(tag, "name = ?", tag.Name).Error
 }
@@ -65,7 +65,7 @@ func ListAllTag() ([]*Tag, error) {
 	return tags, err
 }
 
-// post_tags
+// Insert post_tags
 func (pt *PostTag) Insert() error {
 	return DB.FirstOrCreate(pt, "post_id = ? and tag_id = ?", pt.PostId, pt.TagId).Error
 }

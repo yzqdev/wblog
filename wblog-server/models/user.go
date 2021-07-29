@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// table users
+// User table users
 type User struct {
 	gorm.Model
 	Email         string    `gorm:"unique_index;default:null"` //邮箱
@@ -24,7 +24,6 @@ type User struct {
 }
 
 // Insert user User
-
 func (user *User) Insert() error {
 	fmt.Println(user)
 	return DB.Create(&user).Error
@@ -35,14 +34,12 @@ func (user *User) Update() error {
 	return DB.Save(user).Error
 }
 
-//
 func GetUserByUsername(username string) (*User, error) {
 	var user User
 	err := DB.First(&user, "email = ?", username).Error
 	return &user, err
 }
 
-//
 func (user *User) FirstOrCreate() (*User, error) {
 	err := DB.FirstOrCreate(user, "github_login_id = ?", user.GithubLoginId).Error
 	return user, err

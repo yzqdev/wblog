@@ -12,7 +12,7 @@ import (
 
 // Post
 
-// table posts
+// Post table posts
 type Post struct {
 	BaseModel
 	Title        string     // title

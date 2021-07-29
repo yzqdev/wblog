@@ -16,7 +16,7 @@ type Subscriber struct {
 	Signature      string    //签名
 }
 
-// Subscriber
+// Insert Subscriber
 func (s *Subscriber) Insert() error {
 	return DB.FirstOrCreate(s, "email = ?", s.Email).Error
 }

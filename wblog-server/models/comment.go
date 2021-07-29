@@ -2,7 +2,7 @@ package models
 
 import "strconv"
 
-// table comments
+// Comment table comments
 type Comment struct {
 	BaseModel
 	UserID    uint   // 用户id
