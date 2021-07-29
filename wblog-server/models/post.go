@@ -61,6 +61,10 @@ func (post *Post) Excerpt() template.HTML {
 func ListPublishedPost(tag string, pageIndex, pageSize int) ([]*Post, error) {
 	return _listPost(tag, true, pageIndex, pageSize)
 }
+func GetAllPosts() (posts []*Post) {
+	DB.Table("posts").Find(&posts)
+	return
+}
 
 func ListAllPost(tag string) ([]*Post, error) {
 	return _listPost(tag, false, 0, 0)

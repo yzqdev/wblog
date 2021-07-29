@@ -45,7 +45,7 @@ func IndexGet(c *gin.Context) {
 		post.Body = policy.Sanitize(string(blackfriday.MarkdownCommon([]byte(post.Body))))
 	}
 	user, _ := c.Get(CONTEXT_USER_KEY)
-	c.JSON(http.StatusOK, gin.H{
+	utils.JSON(c, http.StatusOK, "success", gin.H{
 		"posts":           posts,
 		"tags":            models.MustListTag(),
 		"archives":        models.MustListPostArchives(),

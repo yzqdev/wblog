@@ -10,18 +10,19 @@ import (
 // err:  错误码(0:成功, 1:失败, >1:错误码);
 // msg:  请求结果信息;
 // data: 请求结果,根据不同接口返回结果的数据结构不同;
-func JSON(r *gin.Context, code int, msg string, data ...interface{}) {
+func JSON(c *gin.Context, code int, msg string, data ...interface{}) {
 	responseData := interface{}(nil)
 	if len(data) > 0 {
 		responseData = data[0]
 	}
 
-	color.Red.Println(r)
-	r.JSON(code, gin.H{
-		"data":    responseData,
+	color.Red.Println(data)
+	c.JSON(code, gin.H{
+
 		"msg":     msg,
 		"success": true,
 		"code":    code,
+		"data":    responseData,
 	})
 
 }

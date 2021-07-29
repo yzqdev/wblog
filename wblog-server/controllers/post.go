@@ -10,6 +10,11 @@ import (
 	"wblog/models"
 )
 
+func PostAll(c *gin.Context) {
+	posts := models.GetAllPosts()
+
+	utils.JSON(c, http.StatusOK, "success", gin.H{"success": true, "posts": posts})
+}
 func PostGet(c *gin.Context) {
 	id := c.Param("id")
 	post, err := models.GetPostById(id)
@@ -46,7 +51,7 @@ func PostCreate(c *gin.Context) {
 	}
 	err := post.Insert()
 	if err != nil {
-		c.HTML(http.StatusOK, "post/new.html", gin.H{
+		utils.JSON(c, http.StatusOK, "success", gin.H{
 			"post":    post,
 			"message": err.Error(),
 		})
@@ -68,7 +73,7 @@ func PostCreate(c *gin.Context) {
 			pt.Insert()
 		}
 	}
-	c.Redirect(http.StatusMovedPermanently, "/admin/post")
+	utils.JSON(c, 200, "success", post)
 }
 
 func PostEdit(c *gin.Context) {

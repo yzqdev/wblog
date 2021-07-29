@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"wblog/utils"
 
 	"github.com/gin-gonic/gin"
 	"wblog/models"
@@ -11,7 +12,7 @@ import (
 func LinkIndex(c *gin.Context) {
 	links, _ := models.ListLinks()
 	user, _ := c.Get(CONTEXT_USER_KEY)
-	c.HTML(http.StatusOK, "admin/link.html", gin.H{
+	utils.JSON(c, http.StatusOK, "success", gin.H{
 		"links":    links,
 		"user":     user,
 		"comments": models.MustListUnreadComment(),

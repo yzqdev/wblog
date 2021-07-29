@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"wblog/utils"
 
 	"github.com/alimoeeny/gooauth2"
 	"github.com/cihub/seelog"
@@ -315,7 +316,7 @@ func ProfileGet(c *gin.Context) {
 	//查询用户组及该组的功能权限
 	user, _ := userCtx.(models.User)
 	if exists {
-		c.JSON(http.StatusOK, gin.H{
+		utils.JSON(c, http.StatusOK, "success", gin.H{
 			"user":     user,
 			"comments": models.MustListUnreadComment(),
 		})
@@ -327,7 +328,7 @@ func ProfileUpdate(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer writeJSON(c, res)
+
 	avatarUrl := c.PostForm("avatarUrl")
 	nickName := c.PostForm("nickName")
 	sessionUser, _ := c.Get(CONTEXT_USER_KEY)
@@ -343,6 +344,7 @@ func ProfileUpdate(c *gin.Context) {
 	}
 	res["succeed"] = true
 	res["user"] = models.User{AvatarUrl: avatarUrl, NickName: nickName}
+	utils.JSON(c, 200, "success", res)
 }
 
 func BindEmail(c *gin.Context) {
@@ -350,7 +352,7 @@ func BindEmail(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer writeJSON(c, res)
+	defer utils.JSON(c, 200, "success", res)
 	email := c.PostForm("email")
 	sessionUser, _ := c.Get(CONTEXT_USER_KEY)
 	user, ok := sessionUser.(*models.User)
@@ -427,7 +429,7 @@ func UnbindGithub(c *gin.Context) {
 func UserIndex(c *gin.Context) {
 	users, _ := models.ListUsers()
 	user, _ := c.Get(CONTEXT_USER_KEY)
-	c.HTML(http.StatusOK, "admin/user.html", gin.H{
+	utils.JSON(c, http.StatusOK, "success", gin.H{
 		"users":    users,
 		"user":     user,
 		"comments": models.MustListUnreadComment(),

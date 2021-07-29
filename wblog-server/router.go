@@ -26,7 +26,7 @@ func InitRoute(router *gin.Engine) {
 	router.GET("/captcha", controllers.CaptchaGet)
 
 	visitor := router.Group("/visitor")
-	visitor.Use(AuthRequired())
+	visitor.Use(middleware.JwtHandler())
 	{
 		visitor.POST("/new_comment", controllers.CommentPost)
 		visitor.POST("/comment/:id/delete", controllers.CommentDelete)
@@ -39,6 +39,7 @@ func InitRoute(router *gin.Engine) {
 	router.GET("/unsubscribe", controllers.UnSubscribe)
 
 	router.GET("/page/:id", controllers.PageGet)
+	router.GET("/post_all", controllers.PostAll)
 	router.GET("/post/:id", controllers.PostGet)
 	router.GET("/tag/:tag", controllers.TagGet)
 	router.GET("/archives/:year/:month", controllers.ArchiveGet)
@@ -64,7 +65,6 @@ func InitRoute(router *gin.Engine) {
 
 		// post
 		authorized.GET("/post", controllers.PostIndex)
-		authorized.GET("/new_post", controllers.PostNew)
 		authorized.POST("/new_post", controllers.PostCreate)
 		authorized.GET("/post/:id/edit", controllers.PostEdit)
 		authorized.POST("/post/:id/edit", controllers.PostUpdate)
