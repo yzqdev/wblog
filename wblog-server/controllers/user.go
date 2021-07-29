@@ -347,34 +347,36 @@ func ProfileUpdate(c *gin.Context) {
 	utils.JSON(c, 200, "success", res)
 }
 
+// BindEmail 绑定email
+//  测试通过
 func BindEmail(c *gin.Context) {
 	var (
 		err error
 		res = gin.H{}
 	)
-	defer utils.JSON(c, 200, "success", res)
 	email := c.PostForm("email")
 	sessionUser, _ := c.Get(CONTEXT_USER_KEY)
-	user, ok := sessionUser.(*models.User)
+	user, ok := sessionUser.(models.User)
 	if !ok {
 		res["message"] = "server interval error"
-		return
+
 	}
 	if len(user.Email) > 0 {
 		res["message"] = "email have bound"
-		return
+
 	}
 	_, err = models.GetUserByUsername(email)
 	if err == nil {
 		res["message"] = "email have be registered"
-		return
+
 	}
 	err = user.UpdateEmail(email)
 	if err != nil {
 		res["message"] = err.Error()
-		return
+
 	}
 	res["succeed"] = true
+	utils.JSON(c, 200, "success", res)
 }
 
 func UnbindEmail(c *gin.Context) {
@@ -384,7 +386,7 @@ func UnbindEmail(c *gin.Context) {
 	)
 	defer writeJSON(c, res)
 	sessionUser, _ := c.Get(CONTEXT_USER_KEY)
-	user, ok := sessionUser.(*models.User)
+	user, ok := sessionUser.(models.User)
 	if !ok {
 		res["message"] = "server interval error"
 		return

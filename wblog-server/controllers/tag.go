@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"wblog/utils"
 
 	"math"
 
@@ -62,7 +63,7 @@ func TagGet(c *gin.Context) {
 		post.Tags, _ = models.ListTagByPostId(strconv.FormatUint(uint64(post.ID), 10))
 		post.Body = policy.Sanitize(string(blackfriday.MarkdownCommon([]byte(post.Body))))
 	}
-	c.HTML(http.StatusOK, "index/index.html", gin.H{
+	utils.JSON(c, http.StatusOK, "success", gin.H{
 		"posts":           posts,
 		"tags":            models.MustListTag(),
 		"archives":        models.MustListPostArchives(),

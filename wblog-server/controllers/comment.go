@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"net/http"
 	"strconv"
+	"wblog/utils"
 
 	"fmt"
 
@@ -18,10 +20,10 @@ func CommentPost(c *gin.Context) {
 		res  = gin.H{}
 		post *models.Post
 	)
-	defer writeJSON(c, res)
+	defer utils.JSON(c, http.StatusOK, "success", res)
 	s := sessions.Default(c)
-	sessionUserID := s.Get(SESSION_KEY)
-	userId, _ := sessionUserID.(uint)
+	sessionUserID := s.Get(CONTEXT_USER_KEY)
+	user, _ := sessionUserID.(models.User)
 
 	verifyCode := c.PostForm("verifyCode")
 	captchaId := s.Get(SESSION_CAPTCHA)
@@ -52,7 +54,7 @@ func CommentPost(c *gin.Context) {
 	comment := &models.Comment{
 		PostID:  uint(pid),
 		Content: content,
-		UserID:  userId,
+		UserID:  user.ID,
 	}
 	err = comment.Insert()
 	if err != nil {

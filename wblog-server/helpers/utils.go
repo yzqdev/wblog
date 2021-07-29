@@ -31,6 +31,7 @@ func Truncate(s string, n int) string {
 	return s
 }
 
+// UUID 获取uuid
 func UUID() string {
 	return uuid.Rand().Hex()
 }

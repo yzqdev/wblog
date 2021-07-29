@@ -29,7 +29,8 @@ func JwtHandler() gin.HandlerFunc {
 		// 校验token
 		adminUser, err := parseToken(auth)
 		context.Set("user", adminUser)
-
+		color.Cyanln(adminUser)
+		color.Cyanln("token中的user")
 		if err != nil {
 			context.Abort()
 			result.Message = err.Error()
