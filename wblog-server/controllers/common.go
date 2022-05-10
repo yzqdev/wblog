@@ -6,10 +6,8 @@ import (
 	"os"
 	"path"
 
-	"strings"
-
-	"github.com/denisbakhtin/sitemap"
 	"github.com/gin-gonic/gin"
+	"strings"
 	"wblog/helpers"
 	"wblog/models"
 	"wblog/system"
@@ -60,9 +58,9 @@ func CreateXMLSitemap() {
 	os.MkdirAll(folder, os.ModePerm)
 	domain := configuration.Domain
 	now := helpers.GetCurrentTime()
-	items := make([]sitemap.Item, 0)
+	items := make([]helpers.Item, 0)
 
-	items = append(items, sitemap.Item{
+	items = append(items, helpers.Item{
 		Loc:        domain,
 		LastMod:    now,
 		Changefreq: "daily",
@@ -72,7 +70,7 @@ func CreateXMLSitemap() {
 	posts, err := models.ListPublishedPost("", 0, 0)
 	if err == nil {
 		for _, post := range posts {
-			items = append(items, sitemap.Item{
+			items = append(items, helpers.Item{
 				Loc:        fmt.Sprintf("%s/post/%d", domain, post.ID),
 				LastMod:    post.UpdatedAt,
 				Changefreq: "weekly",
@@ -84,7 +82,7 @@ func CreateXMLSitemap() {
 	pages, err := models.ListPublishedPage()
 	if err == nil {
 		for _, page := range pages {
-			items = append(items, sitemap.Item{
+			items = append(items, helpers.Item{
 				Loc:        fmt.Sprintf("%s/page/%d", domain, page.ID),
 				LastMod:    page.UpdatedAt,
 				Changefreq: "monthly",
@@ -93,10 +91,10 @@ func CreateXMLSitemap() {
 		}
 	}
 
-	if err := sitemap.SiteMap(path.Join(folder, "sitemap1.xml.gz"), items); err != nil {
+	if err := helpers.SiteMap(path.Join(folder, "sitemap1.xml.gz"), items); err != nil {
 		return
 	}
-	if err := sitemap.SiteMapIndex(folder, "sitemap_index.xml", domain+"/static/sitemap/"); err != nil {
+	if err := helpers.SiteMapIndex(folder, "sitemap_index.xml", domain+"/static/sitemap/"); err != nil {
 		return
 	}
 }

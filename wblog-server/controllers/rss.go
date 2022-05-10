@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 
-	"github.com/cihub/seelog"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/feeds"
 	"wblog/helpers"
@@ -25,7 +24,6 @@ func RssGet(c *gin.Context) {
 	feed.Items = make([]*feeds.Item, 0)
 	posts, err := models.ListPublishedPost("", 0, 0)
 	if err != nil {
-		seelog.Error(err)
 		return
 	}
 
@@ -41,7 +39,6 @@ func RssGet(c *gin.Context) {
 	}
 	rss, err := feed.ToRss()
 	if err != nil {
-		seelog.Error(err)
 		return
 	}
 	c.Writer.WriteString(rss)

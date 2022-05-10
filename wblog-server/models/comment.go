@@ -5,14 +5,14 @@ import "strconv"
 // table comments
 type Comment struct {
 	BaseModel
-	UserID    uint   // 用户id
-	Content   string // 内容
-	PostID    uint   // 文章id
-	ReadState bool   `gorm:"default:'0'"` // 阅读状态
+	UserID    uint   `json:"user_id"`                         // 用户id
+	Content   string `json:"content"`                         // 内容
+	PostID    uint   `json:"post_id"`                         // 文章id
+	ReadState bool   `json:"read_state" gorm:"default:false"` // 阅读状态
 	//Replies []*Comment // 评论
-	NickName  string `gorm:"-"`
-	AvatarUrl string `gorm:"-"`
-	GithubUrl string `gorm:"-"`
+	NickName  string `json:"nick_name" gorm:"-"`
+	AvatarUrl string `json:"avatar_url" gorm:"-"`
+	GithubUrl string `json:"github_url" gorm:"-"`
 }
 
 // Insert Comment

@@ -3,19 +3,17 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/gookit/color"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
-
-	"github.com/alimoeeny/gooauth2"
-	"github.com/cihub/seelog"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 	"wblog/helpers"
+	oauth "wblog/helpers"
 	"wblog/models"
 	"wblog/system"
 )
@@ -207,7 +205,6 @@ func Oauth2Callback(c *gin.Context) {
 	// exchange accesstoken by code
 	token, err := exchangeTokenByCode(code)
 	if err != nil {
-		seelog.Error(err)
 		c.Redirect(http.StatusMovedPermanently, "/signin")
 		return
 	}
@@ -215,7 +212,6 @@ func Oauth2Callback(c *gin.Context) {
 	//get github userinfo by accesstoken
 	userInfo, err = getGithubUserInfoByAccessToken(token)
 	if err != nil {
-		seelog.Error(err)
 		c.Redirect(http.StatusMovedPermanently, "/signin")
 		return
 	}
@@ -284,7 +280,6 @@ func exchangeTokenByCode(code string) (accessToken string, err error) {
 	// cache token
 	tokenCache := oauth.CacheFile("./request.token")
 	if err := tokenCache.PutToken(token); err != nil {
-		seelog.Error(err)
 	}
 	return
 }

@@ -9,7 +9,6 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/cihub/seelog"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/qiniu/go-sdk/v7/auth/qbox"
@@ -83,24 +82,19 @@ func Backup() (err error) {
 	)
 	u, err = url.Parse(system.GetConfiguration().DSN)
 	if err != nil {
-		seelog.Debug("parse dsn error:%v", err)
 		return
 	}
 	exist, _ = helpers.PathExists(u.Path)
 	if !exist {
 		err = errors.New("database file doesn't exists.")
-		seelog.Debug("database file doesn't exists.")
 		return
 	}
-	seelog.Debug("start backup...")
 	bodyBytes, err = ioutil.ReadFile(u.Path)
 	if err != nil {
-		seelog.Error(err)
 		return
 	}
 	encryptData, err = helpers.Encrypt(bodyBytes, system.GetConfiguration().BackupKey)
 	if err != nil {
-		seelog.Error(err)
 		return
 	}
 
@@ -116,9 +110,7 @@ func Backup() (err error) {
 	fileName := fmt.Sprintf("wblog_%s.db", helpers.GetCurrentTime().Format("20060102150405"))
 	err = uploader.Put(context.Background(), &ret, token, fileName, bytes.NewReader(encryptData), int64(len(encryptData)), &putExtra)
 	if err != nil {
-		seelog.Debugf("backup error:%v", err)
 		return
 	}
-	seelog.Debug("backup succeefully.")
 	return err
 }

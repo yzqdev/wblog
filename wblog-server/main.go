@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
-	"github.com/claudiu/gocron"
 	"github.com/gin-contrib/sessions"
 	"html/template"
+	"io"
 	"net/http"
 
 	"path/filepath"
@@ -12,7 +12,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cihub/seelog"
 	"github.com/gin-gonic/gin"
 	"wblog/controllers"
 	"wblog/helpers"
@@ -23,39 +22,29 @@ import (
 func main() {
 
 	configFilePath := flag.String("C", "conf/conf.yaml", "config file path")
-	logConfigPath := flag.String("L", "conf/seelog.xml", "log config file path")
 	flag.Parse()
-
-	logger, err := seelog.LoggerFromConfigAsFile(*logConfigPath)
-	if err != nil {
-		seelog.Critical("err parsing seelog config file", err)
-		return
-	}
-	seelog.ReplaceLogger(logger)
-	defer seelog.Flush()
+	// 记录到文件。
+	f, _ := os.Create("gin.log")
+	gin.DefaultWriter = io.MultiWriter(f)
 
 	if err := system.LoadConfiguration(*configFilePath); err != nil {
-		seelog.Critical("err parsing config log file", err)
 		return
 	}
 
 	//db, err := models.InitDB()
-	if err != nil {
-		seelog.Critical("err open databases", err)
-		return
-	}
+
 	//设置模式
-	//gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.DebugMode)
 	router := gin.Default()
 
 	//router.Use(SharedData())
 	//router.Static("/static", "./static")
 
-	//setTemplate(router)
+	setTemplate(router)
 
-	gocron.Every(1).Day().Do(controllers.CreateXMLSitemap)
-	gocron.Every(7).Days().Do(controllers.Backup)
-	gocron.Start()
+	//gocron.Every(1).Day().Do(controllers.CreateXMLSitemap)
+	//gocron.Every(7).Days().Do(controllers.Backup)
+	//gocron.Start()
 	InitRoute(router)
 
 	router.Run(system.GetConfiguration().Addr)
@@ -123,7 +112,6 @@ func AdminScopeRequired() gin.HandlerFunc {
 				return
 			}
 		}
-		seelog.Warnf("User not authorized to visit %s", c.Request.RequestURI)
 		c.HTML(http.StatusForbidden, "errors/error.html", gin.H{
 			"message": "Forbidden!",
 		})
@@ -139,7 +127,6 @@ func AuthRequired() gin.HandlerFunc {
 				return
 			}
 		}
-		seelog.Warnf("User not authorized to visit %s", c.Request.RequestURI)
 		c.HTML(http.StatusForbidden, "errors/error.html", gin.H{
 			"message": "Forbidden!",
 		})
@@ -150,7 +137,6 @@ func AuthRequired() gin.HandlerFunc {
 func getCurrentDirectory() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		seelog.Critical(err)
 	}
 	return strings.Replace(dir, "\\", "/", -1)
 }

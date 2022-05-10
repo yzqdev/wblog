@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/snluu/uuid"
 )
 
 // 计算字符串的md5值
@@ -32,7 +31,7 @@ func Truncate(s string, n int) string {
 }
 
 func UUID() string {
-	return uuid.Rand().Hex()
+	return Rand().Hex()
 }
 
 func GetCurrentTime() time.Time {
