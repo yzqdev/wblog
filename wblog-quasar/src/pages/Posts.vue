@@ -1,13 +1,14 @@
 <template>
 <div class="posts">
-<q-card v-for="item in posts" class="posts-card" @click="gotoPost(item)">
-{{item.title}}
-<q-card-section>
+ <q-card v-for="item in posts" class="posts-card" @click="gotoPost(item)">
+    {{item.title}}
+    <q-card-section>
 
-</q-card-section>
+    </q-card-section>
 
 
-</q-card>
+  </q-card>
+
 
 </div>
 </template>

@@ -22,7 +22,6 @@ func PostGet(c *gin.Context) {
 	post.UpdateView()
 	post.Tags, _ = models.ListTagByPostId(id)
 	post.Comments, _ = models.ListCommentByPostID(id)
-	//user, _ := c.Get(helpers.CONTEXT_USER_KEY)
 	helpers.JSON(c, http.StatusOK, "获取成功", post)
 }
 

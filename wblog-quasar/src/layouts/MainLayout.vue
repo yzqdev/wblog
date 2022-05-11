@@ -3,6 +3,7 @@
     <q-header elevated>
       <q-toolbar>
         <q-btn
+          v-if="$q.screen.lt.sm"
           flat
           dense
           round
@@ -10,79 +11,103 @@
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
+        <template v-if="$q.screen.gt.xs">
+          <q-toolbar-title>
+            谦谦博客
+          </q-toolbar-title>
+          <q-toolbar-title v-for="item in linksList" @click="gotoRoute(item)">
+           <q-btn flat> {{item.title}}</q-btn>
+          </q-toolbar-title>
 
-        <q-toolbar-title>
-          我的博客
-        </q-toolbar-title>
 
+        </template>
+        <div>Quasar v{{ $q.version }}</div>
         <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 
     <q-drawer
+
       v-model="leftDrawerOpen"
-      show-if-above
+
       bordered
     >
-      <q-list>
-        <q-item-label
-          header
-        >
+      <q-scroll-area style="height: calc(100% - 150px); margin-top: 150px; border-right: 1px solid #ddd">
+        <q-list padding>
+          <template v-for="item in linksList">
+            <q-item clickable active @click="gotoRoute(item)">
+              <q-item-section avatar>
+                <q-icon :name="item.icon"/>
+              </q-item-section>
 
-        </q-item-label>
+              <q-item-section>
+                {{ item.title }}
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-list>
+      </q-scroll-area>
 
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
+      <q-img class="absolute-top" src="https://cdn.quasar.dev/img/material.png" style="height: 150px">
+        <div class="absolute-bottom bg-transparent">
+          <q-avatar size="56px" class="q-mb-sm">
+            <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+          </q-avatar>
+          <div class="text-weight-bold">谦谦</div>
+          <div>谦谦说世界</div>
+        </div>
+      </q-img>
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <router-view/>
     </q-page-container>
   </q-layout>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import EssentialLink from 'components/EssentialLink.vue'
+import {useRouter} from "vue-router";
+import {Platform} from 'quasar'
+import {computed} from "vue";
+import {watch} from "fs";
 
-const linksList = [
+let router = useRouter()
+const linksList = $ref([
+
   {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
+    title: '博客列表',
+    caption: '我的博客列表',
+    icon: 'code',
+    link: 'posts'
+  },
+  {
+    title: '标签',
+    caption: '我的标签',
+    icon: 'code',
+    link: 'tags'
   },
   {
     title: '博客列表',
     caption: '我的博客列表',
     icon: 'code',
-    link: '/posts'
+    link: 'posts'
   },
 
-];
+]);
+let leftDrawerOpen = $ref(false)
 
-import { defineComponent, ref } from 'vue'
 
-export default defineComponent({
-  name: 'MainLayout',
-
-  components: {
-    EssentialLink
-  },
-
-  setup () {
-    const leftDrawerOpen = ref(false)
-
-    return {
-      essentialLinks: linksList,
-      leftDrawerOpen,
-      toggleLeftDrawer () {
-        leftDrawerOpen.value = !leftDrawerOpen.value
-      }
-    }
+function gotoRoute(item) {
+  if (item.link.includes('http')) {
+    location.assign(item.link)
+  } else {
+    router.push({name: item.link})
   }
-})
+}
+
+
+function toggleLeftDrawer() {
+  leftDrawerOpen = !leftDrawerOpen
+}
 </script>

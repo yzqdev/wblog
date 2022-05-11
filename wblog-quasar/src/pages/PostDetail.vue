@@ -1,10 +1,12 @@
 <template>
-<div class="post-detail">
-  <h2>{{post.title }}</h2>
-  <article>
+<div class="post-detail row wrap justify-start content-stretch">
+  <div class="col col-lg-8  col-xs-12"><h2>{{post.title }}</h2>
+    <article>
 
-  </article>
-  <md-editor preview-only style="display: block!important;" v-model="post.body"></md-editor>
+    </article>
+    <md-editor preview-only style="display: block!important;" v-model="post.body"></md-editor></div>
+
+  <div class="col col-lg-4 col-xs-12" style="background-color: red"></div>
 </div>
 </template>
 
