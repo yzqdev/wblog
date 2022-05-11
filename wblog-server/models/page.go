@@ -2,7 +2,7 @@ package models
 
 import "strconv"
 
-// table pages
+// Page table pages
 type Page struct {
 	BaseModel
 	Title       string // title
@@ -11,7 +11,7 @@ type Page struct {
 	IsPublished bool   // published or not
 }
 
-// Page
+// Insert Page
 func (page *Page) Insert() error {
 	return DB.Create(page).Error
 }

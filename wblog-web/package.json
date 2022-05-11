@@ -1,26 +1,39 @@
 {
-  "name": "wblog",
+  "name": "wblog-web",
+  "private": true,
   "version": "0.0.1",
   "scripts": {
-    "dev": "yarn &&vite --host",
+    "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "build:ts": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "lint": "prettier --write src/**/*.{vue,js,jsx,ts,tsx,json,html}"
   },
   "dependencies": {
-    "@vitejs/plugin-vue": "^1.2.5",
-    "axios": "^0.21.1",
-    "element-plus": "1.0.2-beta.55",
-    "less": "^4.1.1",
-    "prettier": "^2.3.2",
-    "sass": "^1.35.2",
-    "vue": "^3.0.11",
-    "vue-router": "^4.0.10",
-    "vuex": "^4.0.2"
+    "@element-plus/icons-vue": "^1.1.4",
+    "@types/node": "latest",
+    "@types/qs": "^6.9.7",
+    "@vicons/ionicons5": "^0.12.0",
+    "@vueuse/core": "latest",
+    "@vueuse/head": "^0.7.6",
+    "axios": "latest",
+    "dayjs": "^1.11.2",
+    "echarts": "^5.3.2",
+    "element-plus": "latest",
+    "md-editor-v3": "^1.11.12",
+    "pinia": "latest",
+    "prettier": "latest",
+    "qs": "^6.10.3",
+    "sass": "latest",
+    "unplugin-auto-import": "latest",
+    "unplugin-vue-components": "^0.19.3",
+    "vue": "latest",
+    "vue-router": "latest"
   },
   "devDependencies": {
-    "@vue/compiler-sfc": "^3.1.5",
-    "dayjs": "^1.10.6",
-    "trim-html": "^0.1.9",
-    "vite": "^2.4.3"
+    "@vitejs/plugin-vue": "^2.3.2",
+    "typescript": "^4.6.4",
+    "vite": "latest",
+    "vue-tsc": "^0.34.11"
   }
 }

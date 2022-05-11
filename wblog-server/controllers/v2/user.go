@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/gookit/color"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"io/ioutil"
@@ -47,6 +48,10 @@ type GithubUserInfo struct {
 	UpdatedAt         string      `json:"updated_at"`
 	URL               string      `json:"url"`
 }
+type LoginUser struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
 
 func SigninGet(c *gin.Context) {
 	c.HTML(http.StatusOK, "auth/signin.html", nil)
@@ -66,29 +71,29 @@ func LogoutGet(c *gin.Context) {
 func SignupPost(c *gin.Context) {
 	var (
 		err error
-		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
-	email := c.PostForm("email")
-	telephone := c.PostForm("telephone")
-	password := c.PostForm("password")
-	user := &models.User{
-		Email:     email,
-		Telephone: telephone,
-		Password:  password,
-		IsAdmin:   true,
+	loginUser := &LoginUser{}
+	if err = c.ShouldBindJSON(loginUser); err != nil {
+		color.Redln("解析json失败")
 	}
-	if len(user.Email) == 0 || len(user.Password) == 0 {
-		res["message"] = "email or password cannot be null"
+	user := &models.User{
+		Uid:      helpers.UUID(),
+		Username: loginUser.Username,
+		Password: loginUser.Password,
+		IsAdmin:  true,
+	}
+	if len(user.Username) == 0 || len(user.Password) == 0 {
+		helpers.JSON(c, http.StatusOK, "username or password cannot be null", false)
 		return
 	}
-	user.Password = helpers.Md5(user.Email + user.Password)
+	user.Password = helpers.Md5(user.Username + user.Password)
 	err = user.Insert()
 	if err != nil {
-		res["message"] = "邮箱已存在"
+		helpers.JSON(c, http.StatusOK, "邮箱已存在", false)
 		return
 	}
-	res["succeed"] = true
+	helpers.JSON(c, http.StatusOK, "注册成功", true)
+
 }
 
 func SigninPost(c *gin.Context) {
@@ -96,25 +101,23 @@ func SigninPost(c *gin.Context) {
 		err  error
 		user *models.User
 	)
-	username := c.PostForm("username")
-	password := c.PostForm("password")
+	loginUser := &LoginUser{}
+	if err = c.ShouldBindJSON(loginUser); err != nil {
+		color.Redln("解析json失败")
+	}
+	username := loginUser.Username
+	password := loginUser.Password
 	if username == "" || password == "" {
-		c.HTML(http.StatusOK, "auth/signin.html", gin.H{
-			"message": "username or password cannot be null",
-		})
+		helpers.JSON(c, http.StatusBadRequest, "username or password cannot be null", false)
 		return
 	}
 	user, err = models.GetUserByUsername(username)
 	if err != nil || user.Password != helpers.Md5(username+password) {
-		c.HTML(http.StatusOK, "auth/signin.html", gin.H{
-			"message": "invalid username or password",
-		})
+		helpers.JSON(c, http.StatusUnauthorized, "invalid username or password", false)
 		return
 	}
 	if user.LockState {
-		c.HTML(http.StatusOK, "auth/signin.html", gin.H{
-			"message": "Your account have been locked",
-		})
+		helpers.JSON(c, http.StatusForbidden, "Your account have been locked", false)
 		return
 	}
 	s := sessions.Default(c)
@@ -122,9 +125,15 @@ func SigninPost(c *gin.Context) {
 	s.Set(helpers.SESSION_KEY, user.ID)
 	s.Save()
 	if user.IsAdmin {
-		c.Redirect(http.StatusMovedPermanently, "/admin/index")
+		helpers.JSON(c, http.StatusOK, "true", map[string]interface{}{
+			"isAdmin": true,
+			"path":    "/admin/index",
+		})
 	} else {
-		c.Redirect(http.StatusMovedPermanently, "/")
+		helpers.JSON(c, http.StatusOK, "true", map[string]interface{}{
+			"isAdmin": false,
+			"path":    "/",
+		})
 	}
 }
 

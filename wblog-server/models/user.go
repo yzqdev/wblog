@@ -8,6 +8,8 @@ import (
 // table users
 type User struct {
 	gorm.Model
+	Uid           string    `json:"uid" gorm:"type:varchar(64);unique_index;"`
+	Username      string    `json:"username" gorm:"type:varchar(64);unique_index;"`
 	Email         string    `gorm:"unique_index;default:null"` //邮箱
 	Telephone     string    `gorm:"unique_index;default:null"` //手机号码
 	Password      string    `gorm:"default:null"`              //密码
@@ -36,7 +38,7 @@ func (user *User) Update() error {
 //
 func GetUserByUsername(username string) (*User, error) {
 	var user User
-	err := DB.First(&user, "email = ?", username).Error
+	err := DB.First(&user, "username = ?", username).Error
 	return &user, err
 }
 

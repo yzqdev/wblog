@@ -1,7 +1,8 @@
 package models
 
 import (
-	"gorm.io/driver/sqlite"
+	"github.com/gookit/color"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"time"
 	"wblog-server/system"
@@ -47,12 +48,16 @@ var DB *gorm.DB
 
 func InitDB() (*gorm.DB, error) {
 
-	db, err := gorm.Open(sqlite.Open(system.GetConfiguration().DSN), &gorm.Config{})
-	//db, err := gorm.Open("mysql", "root:mysql@/wblog?charset=utf8&parseTime=True&loc=Asia/Shanghai")
+	//db, err := gorm.Open(sqlite.Open(system.GetConfiguration().DSN), &gorm.Config{})
+	g := system.GetConfiguration()
+	color.Redln("链接数据库")
+	color.Redln(g.Mysql)
+	dsn := g.Mysql.User + ":" + g.Mysql.Pass + "@tcp(127.0.0.1:3306)/" + g.Mysql.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err == nil {
 		DB = db
 		//db.LogMode(true)
-		db.AutoMigrate(&Page{}, &Post{}, &Tag{}, &PostTag{}, &User{}, &Comment{}, &Subscriber{}, &Link{}, &SmmsFile{})
+		_ = db.AutoMigrate(&Page{}, &Post{}, &Tag{}, &PostTag{}, &User{}, &Comment{}, &Subscriber{}, &Link{}, &SmmsFile{})
 		//db.Model(&PostTag{}).AddUniqueIndex("uk_post_tag", "post_id", "tag_id")
 		return db, err
 	}
