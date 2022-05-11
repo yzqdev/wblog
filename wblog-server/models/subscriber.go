@@ -5,18 +5,18 @@ import (
 	"time"
 )
 
-// Subscriber table subscribe
+// Subscriber
+// table subscribe
 type Subscriber struct {
 	gorm.Model
-	Email          string    `json:"email" gorm:"unique_index"`          //邮箱
-	VerifyState    bool      `json:"verifyState" gorm:"default:false"`   //验证状态
-	SubscribeState bool      `json:"subscribeState" gorm:"default:true"` //订阅状态
-	OutTime        time.Time `json:"out_time"`                           //过期时间
-	SecretKey      string    `json:"secret_key"`                         // 秘钥
-	Signature      string    `json:"signature"`                          //签名
+	Email          string    `gorm:"unique_index"`  //邮箱
+	VerifyState    bool      `gorm:"default:false"` //验证状态
+	SubscribeState bool      `gorm:"default:true"`  //订阅状态
+	OutTime        time.Time //过期时间
+	SecretKey      string    // 秘钥
+	Signature      string    //签名
 }
 
-// Subscriber
 func (s *Subscriber) Insert() error {
 	return DB.FirstOrCreate(s, "email = ?", s.Email).Error
 }

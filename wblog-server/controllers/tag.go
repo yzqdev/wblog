@@ -1,16 +1,15 @@
 package controllers
 
 import (
-	"net/http"
-	"strconv"
-
-	"math"
-
 	"github.com/gin-gonic/gin"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/russross/blackfriday"
-	"wblog/models"
-	"wblog/system"
+	"math"
+	"net/http"
+	"strconv"
+	"wblog-server/helpers"
+	"wblog-server/models"
+	"wblog-server/system"
 )
 
 func TagCreate(c *gin.Context) {
@@ -18,7 +17,7 @@ func TagCreate(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	name := c.PostForm("value")
 	tag := &models.Tag{Name: name}
 	err = tag.Insert()

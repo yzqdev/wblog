@@ -1,11 +1,10 @@
 package models
 
 import (
-	"strconv"
-	"time"
-
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"time"
+	"wblog-server/system"
 )
 
 // BaseModel I don't need soft delete,so I use customized BaseModel instead gorm.Model
@@ -15,23 +14,15 @@ type BaseModel struct {
 	UpdatedAt time.Time
 }
 
-// Page table pages
-type Page struct {
-	BaseModel
-	Title       string // title
-	Body        string // body
-	View        int    // view count
-	IsPublished bool   // published or not
-}
-
-// PostTag table post_tags
+// table post_tags
 type PostTag struct {
 	BaseModel
 	PostId uint // post id
 	TagId  uint // tag id
+
 }
 
-// QrArchive query result
+// query result
 type QrArchive struct {
 	ArchiveDate time.Time //month
 	Total       int       //total
@@ -54,74 +45,36 @@ type SmmsFile struct {
 
 var DB *gorm.DB
 
-func init() {
-	db, err := gorm.Open(sqlite.Open("wblog.db"), &gorm.Config{})
-	//db, err := gorm.Open("sqlite3", system.GetConfiguration().DSN)
+func InitDB() (*gorm.DB, error) {
+
+	db, err := gorm.Open(sqlite.Open(system.GetConfiguration().DSN), &gorm.Config{})
 	//db, err := gorm.Open("mysql", "root:mysql@/wblog?charset=utf8&parseTime=True&loc=Asia/Shanghai")
 	if err == nil {
 		DB = db
 		//db.LogMode(true)
 		db.AutoMigrate(&Page{}, &Post{}, &Tag{}, &PostTag{}, &User{}, &Comment{}, &Subscriber{}, &Link{}, &SmmsFile{})
 		//db.Model(&PostTag{}).AddUniqueIndex("uk_post_tag", "post_id", "tag_id")
-
+		return db, err
 	}
-
+	return nil, err
 }
 
-// Insert Page 插入数据u
-func (page *Page) Insert() error {
-	return DB.Create(page).Error
+// post_tags
+func (pt *PostTag) Insert() error {
+	return DB.FirstOrCreate(pt, "post_id = ? and tag_id = ?", pt.PostId, pt.TagId).Error
 }
 
-func (page *Page) Update() error {
-	return DB.Model(page).Updates(map[string]interface{}{
-		"title":        page.Title,
-		"body":         page.Body,
-		"is_published": page.IsPublished,
-	}).Error
+func DeletePostTagByPostId(postId uint) error {
+	return DB.Delete(&PostTag{}, "post_id = ?", postId).Error
 }
 
-func (page *Page) UpdateView() error {
-	return DB.Model(page).Updates(map[string]interface{}{
-		"view": page.View,
-	}).Error
-}
+/*func GetLinkByUrl(url string) (*Link, error) {
+	var link Link
+	err := DB.Find(&link, "url = ?", url).Error
+	return &link, err
+}*/
 
-func (page *Page) Delete() error {
-	return DB.Delete(page).Error
-}
-
-func GetPageById(id string) (*Page, error) {
-	pid, err := strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		return nil, err
-	}
-	var page Page
-	err = DB.First(&page, "id = ?", pid).Error
-	return &page, err
-}
-
-func ListPublishedPage() ([]*Page, error) {
-	return _listPage(true)
-}
-
-func ListAllPage() ([]*Page, error) {
-	return _listPage(false)
-}
-
-func _listPage(published bool) ([]*Page, error) {
-	var pages []*Page
-	var err error
-	if published {
-		err = DB.Where("is_published = ?", true).Find(&pages).Error
-	} else {
-		err = DB.Find(&pages).Error
-	}
-	return pages, err
-}
-
-func CountPage() int64 {
-	var count int64
-	DB.Model(&Page{}).Count(&count)
-	return count
+func (sf SmmsFile) Insert() (err error) {
+	err = DB.Create(&sf).Error
+	return
 }

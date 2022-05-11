@@ -2,12 +2,11 @@ package controllers
 
 import (
 	"fmt"
-	"net/http"
-
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"wblog/helpers"
-	"wblog/system"
+	"net/http"
+	"wblog-server/helpers"
+	"wblog-server/system"
 )
 
 func AuthGet(c *gin.Context) {
@@ -15,8 +14,8 @@ func AuthGet(c *gin.Context) {
 
 	session := sessions.Default(c)
 	uuid := helpers.UUID()
-	session.Delete(SESSION_GITHUB_STATE)
-	session.Set(SESSION_GITHUB_STATE, uuid)
+	session.Delete(helpers.SESSION_GITHUB_STATE)
+	session.Set(helpers.SESSION_GITHUB_STATE, uuid)
 	session.Save()
 
 	authurl := "/signin"

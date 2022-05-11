@@ -1,15 +1,13 @@
 package controllers
 
 import (
-	"strconv"
-
 	"fmt"
-
-	"github.com/dchest/captcha"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"wblog/models"
-	"wblog/system"
+	"strconv"
+	"wblog-server/helpers"
+	"wblog-server/models"
+	"wblog-server/system"
 )
 
 func CommentPost(c *gin.Context) {
@@ -18,16 +16,16 @@ func CommentPost(c *gin.Context) {
 		res  = gin.H{}
 		post *models.Post
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	s := sessions.Default(c)
-	sessionUserID := s.Get(SESSION_KEY)
+	sessionUserID := s.Get(helpers.SESSION_KEY)
 	userId, _ := sessionUserID.(uint)
 
 	verifyCode := c.PostForm("verifyCode")
-	captchaId := s.Get(SESSION_CAPTCHA)
-	s.Delete(SESSION_CAPTCHA)
+	captchaId := s.Get(helpers.SESSION_CAPTCHA)
+	s.Delete(helpers.SESSION_CAPTCHA)
 	_captchaId, _ := captchaId.(string)
-	if !captcha.VerifyString(_captchaId, verifyCode) {
+	if !(_captchaId == verifyCode) {
 		res["message"] = "error verifycode"
 		return
 	}
@@ -59,7 +57,7 @@ func CommentPost(c *gin.Context) {
 		res["message"] = err.Error()
 		return
 	}
-	NotifyEmail("[wblog]您有一条新评论", fmt.Sprintf("<a href=\"%s/post/%d\" target=\"_blank\">%s</a>:%s", system.GetConfiguration().Domain, post.ID, post.Title, content))
+	helpers.NotifyEmail("[wblog]您有一条新评论", fmt.Sprintf("<a href=\"%s/post/%d\" target=\"_blank\">%s</a>:%s", system.GetConfiguration().Domain, post.ID, post.Title, content))
 	res["succeed"] = true
 }
 
@@ -69,10 +67,10 @@ func CommentDelete(c *gin.Context) {
 		res = gin.H{}
 		cid uint64
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 
 	s := sessions.Default(c)
-	sessionUserID := s.Get(SESSION_KEY)
+	sessionUserID := s.Get(helpers.SESSION_KEY)
 	userId, _ := sessionUserID.(uint)
 
 	commentId := c.Param("id")
@@ -100,7 +98,7 @@ func CommentRead(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	id = c.Param("id")
 	_id, err = strconv.ParseUint(id, 10, 64)
 	if err != nil {
@@ -122,7 +120,7 @@ func CommentReadAll(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	err = models.SetAllCommentRead()
 	if err != nil {
 		res["message"] = err.Error()

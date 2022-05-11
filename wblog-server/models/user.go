@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"gorm.io/gorm"
 	"time"
 )
@@ -20,17 +19,16 @@ type User struct {
 	IsAdmin       bool      //是否是管理员
 	AvatarUrl     string    // 头像链接
 	NickName      string    // 昵称
-	LockState     bool      `gorm:"default:true"` //锁定状态
+	LockState     bool      `gorm:"default:false"` //锁定状态
 }
 
-// Insert user User
-
+// user
+// insert user
 func (user *User) Insert() error {
-	fmt.Println(user)
-	return DB.Create(&user).Error
+	return DB.Create(user).Error
 }
 
-// Update update user
+// update user
 func (user *User) Update() error {
 	return DB.Save(user).Error
 }

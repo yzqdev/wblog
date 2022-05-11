@@ -2,15 +2,14 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
-	"wblog/helpers"
-	"wblog/models"
-	"wblog/system"
+	"wblog-server/helpers"
+	"wblog-server/models"
+	"wblog-server/system"
 )
 
 func SubscribeGet(c *gin.Context) {
@@ -80,7 +79,7 @@ func sendActiveEmail(subscriber *models.Subscriber) (err error) {
 	subscriber.SecretKey = uuid
 	signature := helpers.Md5(subscriber.Email + uuid + subscriber.OutTime.Format("20060102150405"))
 	subscriber.Signature = signature
-	err = sendMail(subscriber.Email, "[Wblog]邮箱验证", fmt.Sprintf("%s/active?sid=%s", system.GetConfiguration().Domain, signature))
+	err = helpers.SendEmail(subscriber.Email, "[Wblog]邮箱验证", fmt.Sprintf("%s/active?sid=%s", system.GetConfiguration().Domain, signature))
 	if err != nil {
 		return
 	}
@@ -95,46 +94,46 @@ func ActiveSubscriber(c *gin.Context) {
 	)
 	sid := c.Query("sid")
 	if sid == "" {
-		HandleMessage(c, "激活链接有误，请重新获取！")
+		helpers.HandleMessage(c, "激活链接有误，请重新获取！")
 		return
 	}
 	subscriber, err = models.GetSubscriberBySignature(sid)
 	if err != nil {
-		HandleMessage(c, "激活链接有误，请重新获取！")
+		helpers.HandleMessage(c, "激活链接有误，请重新获取！")
 		return
 	}
 	if !helpers.GetCurrentTime().Before(subscriber.OutTime) {
-		HandleMessage(c, "激活链接已过期，请重新获取！")
+		helpers.HandleMessage(c, "激活链接已过期，请重新获取！")
 		return
 	}
 	subscriber.VerifyState = true
 	subscriber.OutTime = helpers.GetCurrentTime()
 	err = subscriber.Update()
 	if err != nil {
-		HandleMessage(c, fmt.Sprintf("激活失败！%s", err.Error()))
+		helpers.HandleMessage(c, fmt.Sprintf("激活失败！%s", err.Error()))
 		return
 	}
-	HandleMessage(c, "激活成功！")
+	helpers.HandleMessage(c, "激活成功！")
 }
 
 func UnSubscribe(c *gin.Context) {
 	sid := c.Query("sid")
 	if sid == "" {
-		HandleMessage(c, "Internal Server Error!")
+		helpers.HandleMessage(c, "Internal Server Error!")
 		return
 	}
 	subscriber, err := models.GetSubscriberBySignature(sid)
 	if err != nil || !subscriber.VerifyState || !subscriber.SubscribeState {
-		HandleMessage(c, "Unscribe failed.")
+		helpers.HandleMessage(c, "Unscribe failed.")
 		return
 	}
 	subscriber.SubscribeState = false
 	err = subscriber.Update()
 	if err == nil {
-		HandleMessage(c, fmt.Sprintf("Unscribe failed.%s", err.Error()))
+		helpers.HandleMessage(c, fmt.Sprintf("Unscribe failed.%s", err.Error()))
 		return
 	}
-	HandleMessage(c, "Unscribe Succeessful!")
+	helpers.HandleMessage(c, "Unscribe Succeessful!")
 }
 
 func GetUnSubcribeUrl(subscriber *models.Subscriber) (string, error) {
@@ -162,13 +161,13 @@ func sendEmailToSubscribers(subject, body string) (err error) {
 		err = errors.New("no subscribers!")
 		return
 	}
-	err = sendMail(strings.Join(emails, ";"), subject, body)
+	err = helpers.SendEmail(strings.Join(emails, ";"), subject, body)
 	return
 }
 
 func SubscriberIndex(c *gin.Context) {
 	subscribers, _ := models.ListSubscriber(false)
-	user, _ := c.Get(CONTEXT_USER_KEY)
+	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
 	c.HTML(http.StatusOK, "admin/subscriber.html", gin.H{
 		"subscribers": subscribers,
 		"user":        user,
@@ -182,12 +181,12 @@ func SubscriberPost(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	mail := c.PostForm("mail")
 	subject := c.PostForm("subject")
 	body := c.PostForm("body")
 	if len(mail) > 0 {
-		err = sendMail(mail, subject, body)
+		err = helpers.SendEmail(mail, subject, body)
 	} else {
 		err = sendEmailToSubscribers(subject, body)
 	}

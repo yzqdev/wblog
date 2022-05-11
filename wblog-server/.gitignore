@@ -23,7 +23,5 @@ request.token
 /vendor/*
 !/vendor/vendor.json
 dockerfile
-go.sum
-*.log
-
-tmp
+tmp/
+wblog-server

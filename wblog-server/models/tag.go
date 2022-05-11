@@ -64,12 +64,3 @@ func ListAllTag() ([]*Tag, error) {
 	err := DB.Model(&Tag{}).Find(&tags).Error
 	return tags, err
 }
-
-// post_tags
-func (pt *PostTag) Insert() error {
-	return DB.FirstOrCreate(pt, "post_id = ? and tag_id = ?", pt.PostId, pt.TagId).Error
-}
-
-func DeletePostTagByPostId(postId uint) error {
-	return DB.Delete(&PostTag{}, "post_id = ?", postId).Error
-}

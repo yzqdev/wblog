@@ -10,8 +10,6 @@ import (
 	"time"
 )
 
-// Post
-
 // table posts
 type Post struct {
 	BaseModel
@@ -24,6 +22,7 @@ type Post struct {
 	CommentTotal int        `gorm:"-"` // count of comment
 }
 
+// Post
 func (post *Post) Insert() error {
 	return DB.Create(post).Error
 }

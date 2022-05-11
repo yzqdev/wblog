@@ -149,7 +149,7 @@ func Oauth2Callback(c *gin.Context) {
 	// exchange accesstoken by code
 	token, err := exchangeTokenByCode(code)
 	if err != nil {
-		system.BlogLog.Error("exchangeTOken error", zap.Error(err))
+		system.BlogLog.Error("exchange token error", zap.Error(err))
 		c.Redirect(http.StatusMovedPermanently, "/signin")
 		return
 	}
@@ -157,7 +157,7 @@ func Oauth2Callback(c *gin.Context) {
 	//get github userinfo by accesstoken
 	userInfo, err = getGithubUserInfoByAccessToken(token)
 	if err != nil {
-		system.BlogLog.Error("github错误", zap.Error(err))
+		system.BlogLog.Error("get github use error", zap.Error(err))
 		c.Redirect(http.StatusMovedPermanently, "/signin")
 		return
 	}
@@ -226,7 +226,7 @@ func exchangeTokenByCode(code string) (accessToken string, err error) {
 	// cache token
 	tokenCache := helpers.CacheFile("./request.token")
 	if err := tokenCache.PutToken(token); err != nil {
-		system.BlogLog.Error("token错误", zap.Error(err))
+		system.BlogLog.Error("request token err", zap.Error(err))
 	}
 	return
 }

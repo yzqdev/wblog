@@ -4,17 +4,17 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"net/url"
-	"os"
-
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/qiniu/go-sdk/v7/auth/qbox"
 	"github.com/qiniu/go-sdk/v7/storage"
-	"wblog/helpers"
-	"wblog/system"
+	"go.uber.org/zap"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"os"
+	"wblog-server/helpers"
+	"wblog-server/system"
 )
 
 func BackupPost(c *gin.Context) {
@@ -22,7 +22,7 @@ func BackupPost(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	err = Backup()
 	if err != nil {
 		res["message"] = err.Error()
@@ -40,7 +40,7 @@ func RestorePost(c *gin.Context) {
 		resp      *http.Response
 		bodyBytes []byte
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	fileName = c.PostForm("fileName")
 	if fileName == "" {
 		res["message"] = "fileName cannot be empty."
@@ -82,19 +82,24 @@ func Backup() (err error) {
 	)
 	u, err = url.Parse(system.GetConfiguration().DSN)
 	if err != nil {
+		system.BlogLog.Error("parse dsn error:%v", zap.Error(err))
 		return
 	}
 	exist, _ = helpers.PathExists(u.Path)
 	if !exist {
 		err = errors.New("database file doesn't exists.")
+		system.BlogLog.Error("database file doesn't exists.", zap.Error(err))
 		return
 	}
+	system.BlogLog.Warn("start backup...")
 	bodyBytes, err = ioutil.ReadFile(u.Path)
 	if err != nil {
+		system.BlogLog.Error("read error", zap.Error(err))
 		return
 	}
 	encryptData, err = helpers.Encrypt(bodyBytes, system.GetConfiguration().BackupKey)
 	if err != nil {
+		system.BlogLog.Error("encrypt error", zap.Error(err))
 		return
 	}
 
@@ -110,7 +115,9 @@ func Backup() (err error) {
 	fileName := fmt.Sprintf("wblog_%s.db", helpers.GetCurrentTime().Format("20060102150405"))
 	err = uploader.Put(context.Background(), &ret, token, fileName, bytes.NewReader(encryptData), int64(len(encryptData)), &putExtra)
 	if err != nil {
+		system.BlogLog.Error("backup error:%v", zap.Error(err))
 		return
 	}
+	system.BlogLog.Warn("backup succeefully.")
 	return err
 }

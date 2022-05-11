@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"mime/multipart"
+	"wblog-server/helpers"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +16,7 @@ func Upload(c *gin.Context) {
 		file     multipart.File
 		fh       *multipart.FileHeader
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	file, fh, err = c.Request.FormFile("file")
 	if err != nil {
 		res["message"] = err.Error()

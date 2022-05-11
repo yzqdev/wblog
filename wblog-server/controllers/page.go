@@ -3,22 +3,22 @@ package controllers
 import (
 	"net/http"
 	"strconv"
-	"wblog/utils"
+	"wblog-server/helpers"
 
 	"github.com/gin-gonic/gin"
-	"wblog/models"
+	"wblog-server/models"
 )
 
 func PageGet(c *gin.Context) {
 	id := c.Param("id")
 	page, err := models.GetPageById(id)
 	if err != nil || !page.IsPublished {
-		Handle404(c)
+		helpers.Handle404(c)
 		return
 	}
 	page.View++
 	page.UpdateView()
-	c.JSON(http.StatusOK, gin.H{
+	c.HTML(http.StatusOK, "page/display.html", gin.H{
 		"page": page,
 	})
 }
@@ -52,7 +52,7 @@ func PageEdit(c *gin.Context) {
 	id := c.Param("id")
 	page, err := models.GetPageById(id)
 	if err != nil {
-		Handle404(c)
+		helpers.Handle404(c)
 	}
 	c.HTML(http.StatusOK, "page/modify.html", gin.H{
 		"page": page,
@@ -85,7 +85,7 @@ func PagePublish(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	id := c.Param("id")
 	page, err := models.GetPageById(id)
 	if err == nil {
@@ -106,7 +106,7 @@ func PageDelete(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	id := c.Param("id")
 	pid, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
@@ -125,8 +125,8 @@ func PageDelete(c *gin.Context) {
 
 func PageIndex(c *gin.Context) {
 	pages, _ := models.ListAllPage()
-	user, _ := c.Get(CONTEXT_USER_KEY)
-	utils.JSON(c, 200, "success", gin.H{
+	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
+	c.HTML(http.StatusOK, "admin/page.html", gin.H{
 		"pages":    pages,
 		"user":     user,
 		"comments": models.MustListUnreadComment(),

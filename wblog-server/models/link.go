@@ -2,6 +2,7 @@ package models
 
 import "gorm.io/gorm"
 
+// Link
 // table link
 type Link struct {
 	gorm.Model
@@ -11,7 +12,6 @@ type Link struct {
 	View int    //访问次数
 }
 
-// Link
 func (link *Link) Insert() error {
 	return DB.FirstOrCreate(link, "url = ?", link.Url).Error
 }
@@ -39,15 +39,4 @@ func GetLinkById(id uint) (*Link, error) {
 	var link Link
 	err := DB.FirstOrCreate(&link, "id = ?", id).Error
 	return &link, err
-}
-
-/*func GetLinkByUrl(url string) (*Link, error) {
-	var link Link
-	err := DB.Find(&link, "url = ?", url).Error
-	return &link, err
-}*/
-
-func (sf SmmsFile) Insert() (err error) {
-	err = DB.Create(&sf).Error
-	return
 }

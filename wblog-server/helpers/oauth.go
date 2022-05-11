@@ -1,3 +1,16 @@
+package helpers
+
+import (
+	"encoding/json"
+	"io/ioutil"
+	"log"
+	"mime"
+	"net/http"
+	"net/url"
+	"os"
+	"time"
+)
+
 // Copyright 2011 The goauth2 Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -35,19 +48,6 @@
 //		// btw, r.FormValue("state") == "foo"
 //	}
 //
-package helpers
-
-import (
-	"encoding/json"
-	"io/ioutil"
-	"log"
-	"mime"
-	"net/http"
-	"net/url"
-	"os"
-	"time"
-)
-
 type OAuthError struct {
 	prefix string
 	msg    string

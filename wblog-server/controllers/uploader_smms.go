@@ -8,10 +8,8 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
-
-	"wblog/models"
-
-	"wblog/system"
+	"wblog-server/models"
+	"wblog-server/system"
 )
 
 type SmmsUploader struct {

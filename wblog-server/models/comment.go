@@ -2,20 +2,21 @@ package models
 
 import "strconv"
 
+// Comment
+
 // table comments
 type Comment struct {
 	BaseModel
-	UserID    uint   `json:"user_id"`                         // 用户id
-	Content   string `json:"content"`                         // 内容
-	PostID    uint   `json:"post_id"`                         // 文章id
-	ReadState bool   `json:"read_state" gorm:"default:false"` // 阅读状态
+	UserID    uint   // 用户id
+	Content   string // 内容
+	PostID    uint   // 文章id
+	ReadState bool   `gorm:"default:false"` // 阅读状态
 	//Replies []*Comment // 评论
-	NickName  string `json:"nick_name" gorm:"-"`
-	AvatarUrl string `json:"avatar_url" gorm:"-"`
-	GithubUrl string `json:"github_url" gorm:"-"`
+	NickName  string `gorm:"-"`
+	AvatarUrl string `gorm:"-"`
+	GithubUrl string `gorm:"-"`
 }
 
-// Insert Comment
 func (comment *Comment) Insert() error {
 	return DB.Create(comment).Error
 }

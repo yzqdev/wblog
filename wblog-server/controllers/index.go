@@ -1,17 +1,15 @@
 package controllers
 
 import (
-	"net/http"
-	"strconv"
-	"wblog/utils"
-
-	"math"
-
 	"github.com/gin-gonic/gin"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/russross/blackfriday"
-	"wblog/models"
-	"wblog/system"
+	"math"
+	"net/http"
+	"strconv"
+	"wblog-server/helpers"
+	"wblog-server/models"
+	"wblog-server/system"
 )
 
 func IndexGet(c *gin.Context) {
@@ -44,8 +42,8 @@ func IndexGet(c *gin.Context) {
 		post.Tags, _ = models.ListTagByPostId(strconv.FormatUint(uint64(post.ID), 10))
 		post.Body = policy.Sanitize(string(blackfriday.MarkdownCommon([]byte(post.Body))))
 	}
-	user, _ := c.Get(CONTEXT_USER_KEY)
-	c.JSON(http.StatusOK, gin.H{
+	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
+	c.HTML(http.StatusOK, "index/index.html", gin.H{
 		"posts":           posts,
 		"tags":            models.MustListTag(),
 		"archives":        models.MustListPostArchives(),
@@ -60,11 +58,13 @@ func IndexGet(c *gin.Context) {
 }
 
 func AdminIndex(c *gin.Context) {
-	user, _ := c.Get(CONTEXT_USER_KEY)
-	utils.JSON(c, 200, "hello", gin.H{"pageCount": models.CountPage(),
+	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
+	c.HTML(http.StatusOK, "admin/index.html", gin.H{
+		"pageCount":    models.CountPage(),
 		"postCount":    models.CountPost(),
 		"tagCount":     models.CountTag(),
 		"commentCount": models.CountComment(),
 		"user":         user,
-		"comments":     models.MustListUnreadComment()})
+		"comments":     models.MustListUnreadComment(),
+	})
 }

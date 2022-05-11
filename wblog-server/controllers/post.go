@@ -4,25 +4,25 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"wblog/utils"
+	"wblog-server/helpers"
 
 	"github.com/gin-gonic/gin"
-	"wblog/models"
+	"wblog-server/models"
 )
 
 func PostGet(c *gin.Context) {
 	id := c.Param("id")
 	post, err := models.GetPostById(id)
 	if err != nil || !post.IsPublished {
-		Handle404(c)
+		helpers.Handle404(c)
 		return
 	}
 	post.View++
 	post.UpdateView()
 	post.Tags, _ = models.ListTagByPostId(id)
 	post.Comments, _ = models.ListCommentByPostID(id)
-	user, _ := c.Get(CONTEXT_USER_KEY)
-	c.JSON(http.StatusOK, gin.H{
+	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
+	c.HTML(http.StatusOK, "post/display.html", gin.H{
 		"post": post,
 		"user": user,
 	})
@@ -75,7 +75,7 @@ func PostEdit(c *gin.Context) {
 	id := c.Param("id")
 	post, err := models.GetPostById(id)
 	if err != nil {
-		Handle404(c)
+		helpers.Handle404(c)
 		return
 	}
 	post.Tags, _ = models.ListTagByPostId(id)
@@ -94,7 +94,7 @@ func PostUpdate(c *gin.Context) {
 
 	pid, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
-		Handle404(c)
+		helpers.Handle404(c)
 		return
 	}
 
@@ -138,7 +138,7 @@ func PostPublish(c *gin.Context) {
 		res  = gin.H{}
 		post *models.Post
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	id := c.Param("id")
 	post, err = models.GetPostById(id)
 	if err != nil {
@@ -159,7 +159,7 @@ func PostDelete(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	id := c.Param("id")
 	pid, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
@@ -179,8 +179,8 @@ func PostDelete(c *gin.Context) {
 
 func PostIndex(c *gin.Context) {
 	posts, _ := models.ListAllPost("")
-	user, _ := c.Get(CONTEXT_USER_KEY)
-	utils.JSON(c, 200, "success", gin.H{
+	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
+	c.HTML(http.StatusOK, "admin/post.html", gin.H{
 		"posts":    posts,
 		"Active":   "posts",
 		"user":     user,

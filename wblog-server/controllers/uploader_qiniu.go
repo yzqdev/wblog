@@ -2,25 +2,24 @@ package controllers
 
 import (
 	"context"
-	"mime/multipart"
-	"os"
-
 	"github.com/qiniu/go-sdk/v7/auth/qbox"
 	"github.com/qiniu/go-sdk/v7/storage"
-	"wblog/system"
+	"mime/multipart"
+	"os"
+	"wblog-server/system"
 )
 
-// Size 获取文件大小的接口
+// 获取文件大小的接口
 type Size interface {
 	Size() int64
 }
 
-// Stat 获取文件信息的接口
+// 获取文件信息的接口
 type Stat interface {
 	Stat() (os.FileInfo, error)
 }
 
-// PutRet 构造返回值字段
+// 构造返回值字段
 type PutRet struct {
 	Hash string `json:"hash"`
 	Key  string `json:"key"`

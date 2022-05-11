@@ -1,16 +1,17 @@
 package controllers
 
 import (
-	"github.com/dchest/captcha"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/steambap/captcha"
+	"wblog-server/helpers"
 )
 
 func CaptchaGet(context *gin.Context) {
 	session := sessions.Default(context)
-	captchaId := captcha.NewLen(4)
-	session.Delete(SESSION_CAPTCHA)
-	session.Set(SESSION_CAPTCHA, captchaId)
+	data, _ := captcha.NewMathExpr(150, 50)
+	session.Delete(helpers.SESSION_CAPTCHA)
+	session.Set(helpers.SESSION_CAPTCHA, data.Text)
 	session.Save()
-	captcha.WriteImage(context.Writer, captchaId, 100, 40)
+	data.WriteImage(context.Writer)
 }

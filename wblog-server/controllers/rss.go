@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/feeds"
-	"wblog/helpers"
-	"wblog/models"
-	"wblog/system"
+	"go.uber.org/zap"
+	"wblog-server/helpers"
+	"wblog-server/models"
+	"wblog-server/system"
 )
 
 func RssGet(c *gin.Context) {
@@ -24,6 +24,7 @@ func RssGet(c *gin.Context) {
 	feed.Items = make([]*feeds.Item, 0)
 	posts, err := models.ListPublishedPost("", 0, 0)
 	if err != nil {
+		system.BlogLog.Error("parse error", zap.Error(err))
 		return
 	}
 
@@ -39,6 +40,7 @@ func RssGet(c *gin.Context) {
 	}
 	rss, err := feed.ToRss()
 	if err != nil {
+		system.BlogLog.Error("feed to rss error", zap.Error(err))
 		return
 	}
 	c.Writer.WriteString(rss)

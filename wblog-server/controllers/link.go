@@ -3,14 +3,15 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"wblog-server/helpers"
 
 	"github.com/gin-gonic/gin"
-	"wblog/models"
+	"wblog-server/models"
 )
 
 func LinkIndex(c *gin.Context) {
 	links, _ := models.ListLinks()
-	user, _ := c.Get(CONTEXT_USER_KEY)
+	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
 	c.HTML(http.StatusOK, "admin/link.html", gin.H{
 		"links":    links,
 		"user":     user,
@@ -24,7 +25,7 @@ func LinkCreate(c *gin.Context) {
 		res   = gin.H{}
 		_sort int64
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	name := c.PostForm("name")
 	url := c.PostForm("url")
 	sort := c.PostForm("sort")
@@ -57,7 +58,7 @@ func LinkUpdate(c *gin.Context) {
 		err   error
 		res   = gin.H{}
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	id := c.Param("id")
 	name := c.PostForm("name")
 	url := c.PostForm("url")
@@ -109,7 +110,7 @@ func LinkDelete(c *gin.Context) {
 		_id uint64
 		res = gin.H{}
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	id := c.Param("id")
 	_id, err = strconv.ParseUint(id, 10, 64)
 	if err != nil {

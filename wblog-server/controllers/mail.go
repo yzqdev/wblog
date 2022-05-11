@@ -2,11 +2,12 @@ package controllers
 
 import (
 	"strings"
+	"wblog-server/helpers"
 
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"wblog/models"
+	"wblog-server/models"
 )
 
 func SendMail(c *gin.Context) {
@@ -16,7 +17,7 @@ func SendMail(c *gin.Context) {
 		uid        uint64
 		subscriber *models.Subscriber
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	subject := c.PostForm("subject")
 	content := c.PostForm("content")
 	userId := c.Query("userId")
@@ -35,7 +36,7 @@ func SendMail(c *gin.Context) {
 		res["message"] = err.Error()
 		return
 	}
-	err = sendMail(subscriber.Email, subject, content)
+	err = helpers.SendEmail(subscriber.Email, subject, content)
 	if err != nil {
 		res["message"] = err.Error()
 		return
@@ -50,7 +51,7 @@ func SendBatchMail(c *gin.Context) {
 		subscribers []*models.Subscriber
 		emails      = make([]string, 0)
 	)
-	defer writeJSON(c, res)
+	defer helpers.WriteJson(c, res)
 	subject := c.PostForm("subject")
 	content := c.PostForm("content")
 	if subject == "" || content == "" {
@@ -65,7 +66,7 @@ func SendBatchMail(c *gin.Context) {
 	for _, subscriber := range subscribers {
 		emails = append(emails, subscriber.Email)
 	}
-	err = sendMail(strings.Join(emails, ";"), subject, content)
+	err = helpers.SendEmail(strings.Join(emails, ";"), subject, content)
 	if err != nil {
 		res["message"] = err.Error()
 		return
