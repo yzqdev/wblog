@@ -5,6 +5,7 @@ import (
 	"github.com/gookit/color"
 	"wblog-server/controllers"
 	v2 "wblog-server/controllers/v2"
+	"wblog-server/middleware"
 	"wblog-server/system"
 )
 
@@ -14,6 +15,12 @@ func InitRouterV2(router *gin.Engine) {
 	{
 		auth.POST("/login", v2.SigninPost)
 		auth.POST("/reg", v2.SignupPost)
+	}
+	adminRouter := v2Router.Group("/admin", middleware.JwtHandler())
+	{
+		adminRouter.GET("/posts", v2.PostIndex)
+		adminRouter.POST("/posts", v2.PostCreate)
+		adminRouter.DELETE("/posts/:id", v2.PostDelete)
 	}
 
 }

@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"github.com/gookit/color"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 	"wblog-server/helpers"
 	"wblog-server/models"
 	"wblog-server/system"
@@ -48,17 +50,16 @@ type GithubUserInfo struct {
 	UpdatedAt         string      `json:"updated_at"`
 	URL               string      `json:"url"`
 }
+
+var SecretKey = []byte("9hUxqaGelNnCZaCW")
+
 type LoginUser struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
-
-func SigninGet(c *gin.Context) {
-	c.HTML(http.StatusOK, "auth/signin.html", nil)
-}
-
-func SignupGet(c *gin.Context) {
-	c.HTML(http.StatusOK, "auth/signup.html", nil)
+type NewJwtClaims struct {
+	*models.User
+	jwt.StandardClaims
 }
 
 func LogoutGet(c *gin.Context) {
@@ -120,15 +121,45 @@ func SigninPost(c *gin.Context) {
 		helpers.JSON(c, http.StatusForbidden, "Your account have been locked", false)
 		return
 	}
-	s := sessions.Default(c)
-	s.Clear()
-	s.Set(helpers.SESSION_KEY, user.ID)
-	s.Save()
+
 	if user.IsAdmin {
-		helpers.JSON(c, http.StatusOK, "true", map[string]interface{}{
-			"isAdmin": true,
-			"path":    "/admin/index",
-		})
+		expiresTime := time.Now().Unix() + int64(60*60*24)
+		//claims := jwt.StandardClaims{
+		//	Audience:  user.Username,          // 受众
+		//	ExpiresAt: expiresTime,            // 失效时间
+		//	Id:        string(rune(user.Uid)), // 编号
+		//	IssuedAt:  time.Now().Unix(),      // 签发时间
+		//	Issuer:    sqlU.Username,            // 签发人
+		//	NotBefore: time.Now().Unix(),      // 生效时间
+		//	Subject:   "login",                // 主题
+		//}
+
+		stdClaims := jwt.StandardClaims{
+
+			Audience:  "啊啊啊",             // 受众
+			ExpiresAt: expiresTime,       // 失效时间
+			Id:        "id",              // 编号
+			IssuedAt:  time.Now().Unix(), // 签发时间
+			Issuer:    "sqlU.Username",   // 签发人
+			NotBefore: time.Now().Unix(), // 生效时间
+			Subject:   "login",           // 主题
+		}
+		newClaims := NewJwtClaims{
+			User:           user,
+			StandardClaims: stdClaims,
+		}
+		tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, newClaims)
+		if token, err := tokenClaims.SignedString(SecretKey); err == nil {
+			helpers.JSON(c, http.StatusOK, "true", map[string]interface{}{
+				"isAdmin": true,
+				"token":   token,
+				"path":    "/admin/index",
+			})
+		} else {
+
+			helpers.JSON(c, http.StatusOK, "登录失败，请重新登陆", false)
+		}
+
 	} else {
 		helpers.JSON(c, http.StatusOK, "true", map[string]interface{}{
 			"isAdmin": false,

@@ -111,8 +111,8 @@ function login() {
       loginApi(loginForm ).then(
           (res) => {
             if (res.success) {
-              localStorage.token = res.data;
-              store.setUserToken(res.data)
+              localStorage.token = res.data.token;
+              store.setUserToken(res.data.token)
               ElMessage({ message: "success", type: "success" });
 
               router.push({ name: "adminHome" });

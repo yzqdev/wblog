@@ -1,12 +1,16 @@
 <template>
   <div>用户管理</div>
   <el-table :data="tableData">
-    <el-table-column prop="name" label="姓名"></el-table-column>
-    <el-table-column prop="sex" label="性别"></el-table-column>
-    <el-table-column prop="age" label="年龄"></el-table-column>
-    <el-table-column prop="birthday" label="出生日期">
+    <el-table-column prop="title" label="标题"></el-table-column>
+    <el-table-column prop="is_published" label="公开"></el-table-column>
+    <el-table-column prop="created_at" label="创建时间">
       <template #default="{ row }">
-        <span>{{ formatDate(row.birthday) }}</span>
+        <span>{{ formatDate(row.created_at) }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column prop="updated_at" label="更新时间">
+      <template #default="{ row }">
+        <span>{{ formatDate(row.updated_at) }}</span>
       </template>
     </el-table-column>
     <el-table-column label="操作">
@@ -17,52 +21,51 @@
     </el-table-column>
   </el-table>
   <el-dialog v-model="dialogVisible">
-    <template #title> 用户信息 </template>
+    <template #title> 文章信息 </template>
     <p>{{ cur.id }}</p>
-    <p>{{ cur.name }}</p>
-    <p>{{ cur.sex }}</p>
+    <p>{{ cur.title }}</p>
+    <md-editor-v3 preview-only v-model="cur.body"></md-editor-v3>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
 import dayjs from "dayjs";
 import { ElMessage } from "element-plus";
+import {delPostsApi, getPostsApi} from "@/utils/apis";
 
-interface User {
+interface Passage {
   id: string;
-  name: string;
-  sex: string;
-  age: number;
-  birthday: string;
+  title: string;
+is_published:string
+  updated_at: string;
+  created_at: string;
 }
 
 let dialogVisible = $ref<boolean>(false);
-let cur = $ref<User>();
-let tableData = $ref<User[]>([
-  { id: "1", name: "小明", sex: "女", age: 12, birthday: "1922-12-12" },
-  { id: "2", name: "小蓝", sex: "女", age: 56, birthday: "2122-03-12" },
-  { id: "3", name: "凝光", sex: "女", age: 34, birthday: "2022-03-12" },
-  { id: "4", name: "小白", sex: "女", age: 34, birthday: "2013-03-12" },
-  { id: "5", name: "刻晴", sex: "女", age: 34, birthday: "2011-03-12" },
-  { id: "6", name: "雷军", sex: "女", age: 34, birthday: "2000-03-12" },
-]);
+let cur = $ref<Passage>();
+let tableData = $ref<Passage[]>( );
+onMounted(async () => {
+ await getAllPosts()
 
+})
+async function getAllPosts() {
+  let {data}=await getPostsApi()
+
+  tableData=data.posts
+}
 function formatDate(date: string) {
   return dayjs(date).format("YYYY-MM-DD HH:mm:ss");
 }
 
-function showDialog(row: User) {
+function showDialog(row: Passage) {
   cur = row;
   dialogVisible = true;
 }
 
-function deleteRow(row: User) {
-  for (let index = tableData.length - 1; index >= 0; index--) {
-    if (tableData[index] && tableData[index].id === row.id) {
-      tableData.splice(index, 1);
-    }
-  }
-  ElMessage({ type: "success", message: `删除成功!${row.name}` });
+async function deleteRow(row: Passage) {
+   let data=await  delPostsApi(row.id)
+await  getAllPosts()
+  ElMessage({ type: "success", message: `删除${row.title}成功!` });
 }
 </script>
 

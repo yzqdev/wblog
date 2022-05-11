@@ -7,6 +7,7 @@ require (
 	github.com/gin-contrib/sessions v0.0.5
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-co-op/gocron v1.13.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gookit/color v1.5.0
 	github.com/gorilla/feeds v1.1.1
 	github.com/microcosm-cc/bluemonday v1.0.18

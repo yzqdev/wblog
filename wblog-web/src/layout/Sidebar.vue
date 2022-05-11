@@ -28,7 +28,7 @@
           <el-icon>
             <icon-menu />
           </el-icon>
-          <template #title>通知公告</template>
+          <template #title>发布文章</template>
         </el-menu-item>
         <el-menu-item index="profile" @click="gotoRoute('profile')">
           <el-icon>
@@ -40,7 +40,7 @@
           <el-icon>
             <user />
           </el-icon>
-          <template #title>用户管理</template>
+          <template #title>文章管理</template>
         </el-menu-item>
       </el-sub-menu>
       <el-sub-menu index="others">
