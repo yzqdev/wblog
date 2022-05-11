@@ -22,6 +22,11 @@ func InitRouterV2(router *gin.Engine) {
 		adminRouter.POST("/posts", v2.PostCreate)
 		adminRouter.DELETE("/posts/:id", v2.PostDelete)
 	}
+	homeRouter := v2Router.Group("/home")
+	{
+		homeRouter.GET("/posts", v2.PostIndex)
+		homeRouter.GET("/post/:id", v2.PostGet)
+	}
 
 }
 func InitRouter(router *gin.Engine) {
