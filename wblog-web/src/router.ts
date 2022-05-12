@@ -8,8 +8,8 @@ import { setDocumentTitle } from "./utils/meta";
 import NotFound from "./components/NotFound.vue";
 import Layout from "./layout/Index.vue";
 import Main from "./views/Main.vue";
-import UserProfile from "./views/system/UserProfile.vue";
-import UserManage from "./views/system/UserManage.vue";
+import LinkManage from "./views/system/LinkManage.vue";
+import PostManage from "./views/system/PostManage.vue";
 import CustomDirective from "./views/others/CustomDirective.vue";
 import Charts from "./views/others/Charts.vue";
 import Icons from "./views/others/Icons.vue";
@@ -41,19 +41,19 @@ let routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: "userManage",
-        component: UserManage,
-        name: "userManage",
+        path: "linkManage",
+        component: LinkManage,
+        name: "linkManage",
         meta: {
-          title: "用户管理",
+          title: "链接管理",
         },
       },
       {
-        path: "profile",
-        component: UserProfile,
-        name: "profile",
+        path: "postManage",
+        component: PostManage,
+        name: "postManage",
         meta: {
-          title: "用户信息",
+          title: "文章管理",
         },
       },
       {

@@ -15,18 +15,25 @@ func InitRouterV2(router *gin.Engine) {
 	{
 		auth.POST("/login", v2.SigninPost)
 		auth.POST("/reg", v2.SignupPost)
+
 	}
 	adminRouter := v2Router.Group("/admin", middleware.JwtHandler())
 	{
+		adminRouter.GET("/userInfo", v2.UserInfo)
 		adminRouter.GET("/posts", v2.PostIndex)
 		adminRouter.POST("/posts", v2.PostCreate)
 		adminRouter.DELETE("/posts/:id", v2.PostDelete)
+		adminRouter.GET("/links", v2.LinkIndex)
+		adminRouter.POST("/link", v2.LinkCreate)
+		adminRouter.DELETE("/link/:id", v2.LinkDelete)
+		adminRouter.GET("/comment/unread", v2.ListCommentUnRead)
 	}
 	homeRouter := v2Router.Group("/home")
 	{
 		homeRouter.GET("/posts", v2.PostIndex)
 		homeRouter.GET("/post/:id", v2.PostGet)
 		homeRouter.GET("/links", v2.LinkIndex)
+
 		homeRouter.POST("/comment/:postId", v2.CommentPost)
 	}
 

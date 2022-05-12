@@ -87,6 +87,10 @@ func CommentDelete(c *gin.Context) {
 	}
 	res["succeed"] = true
 }
+func ListCommentUnRead(c *gin.Context) {
+	comments := models.MustListUnreadComment()
+	helpers.JSON(c, http.StatusOK, "获取成功", comments)
+}
 
 func CommentRead(c *gin.Context) {
 	var (

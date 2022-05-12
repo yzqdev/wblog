@@ -31,30 +31,26 @@
 <script setup lang="ts">
 import dayjs from "dayjs";
 import { ElMessage } from "element-plus";
-import {delPostsApi, getPostsApi} from "@/utils/apis";
-
+import { delPostsApi, getPostsApi } from "@/utils/apis";
+import { formatDate } from "@/utils/util";
 interface Passage {
   id: string;
   title: string;
-is_published:string
+  is_published: string;
   updated_at: string;
   created_at: string;
 }
 
 let dialogVisible = $ref<boolean>(false);
 let cur = $ref<Passage>();
-let tableData = $ref<Passage[]>( );
+let tableData = $ref<Passage[]>();
 onMounted(async () => {
- await getAllPosts()
-
-})
+  await getAllPosts();
+});
 async function getAllPosts() {
-  let {data}=await getPostsApi()
+  let { data } = await getPostsApi();
 
-  tableData=data.posts
-}
-function formatDate(date: string) {
-  return dayjs(date).format("YYYY-MM-DD HH:mm:ss");
+  tableData = data.posts;
 }
 
 function showDialog(row: Passage) {
@@ -63,8 +59,8 @@ function showDialog(row: Passage) {
 }
 
 async function deleteRow(row: Passage) {
-   let data=await  delPostsApi(row.id)
-await  getAllPosts()
+  let data = await delPostsApi(row.id);
+  await getAllPosts();
   ElMessage({ type: "success", message: `删除${row.title}成功!` });
 }
 </script>

@@ -24,23 +24,23 @@
         <template #title
           ><el-icon><setting /></el-icon><span>管理</span></template
         >
+        <el-menu-item index="postManage" @click="gotoRoute('postManage')">
+          <el-icon>
+            <user />
+          </el-icon>
+          <template #title>文章管理</template>
+        </el-menu-item>
         <el-menu-item index="notice" @click="gotoRoute('notice')">
           <el-icon>
             <icon-menu />
           </el-icon>
           <template #title>发布文章</template>
         </el-menu-item>
-        <el-menu-item index="profile" @click="gotoRoute('profile')">
+        <el-menu-item index="linkManage" @click="gotoRoute('linkManage')">
           <el-icon>
             <credit-card />
           </el-icon>
-          <template #title>用户管理</template>
-        </el-menu-item>
-        <el-menu-item index="userManage" @click="gotoRoute('userManage')">
-          <el-icon>
-            <user />
-          </el-icon>
-          <template #title>文章管理</template>
+          <template #title>链接管理</template>
         </el-menu-item>
       </el-sub-menu>
       <el-sub-menu index="others">

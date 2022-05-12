@@ -2,6 +2,37 @@
   <header class="header">
     <el-link style="margin-left: 0.5rem" v-html="notice"></el-link>
     <span class="header-right">
+      <el-dropdown trigger="click">
+        <el-badge v-if="comments.length > 0" :value="comments.length">
+          <el-icon :size="20">
+            <bell /> </el-icon
+        ></el-badge>
+        <template #dropdown>
+          <section class="notice-tab">
+            <article class="notice-head">
+            <div class="text-base flex-1">通知</div>
+            <div class="text-base flex-1 cursor-pointer text-right  text-primary" @click="readAll">全部已读</div>
+            </article>
+            <article class="notice-item" v-for="item in comments">
+              <div class="m-2">
+                <el-avatar
+                  size="large"
+                  src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
+                ></el-avatar>
+              </div>
+              <div
+             class="flex flex-col justify-center"
+              >
+                <div>
+                  <el-link href="hh">{{ item.content }}</el-link>
+                </div>
+                <div>{{ formatDate(item.created_at) }}</div>
+              </div>
+            </article>
+          </section>
+          <section class="border-2 border-gray-100"><el-button class=" w-full" type="primary" text>查看所有</el-button></section>
+        </template>
+      </el-dropdown>
       <el-icon @click="toggle" :size="20">
         <full-screen />
       </el-icon>
@@ -14,8 +45,10 @@
             :size="30"
             src="https://img-static.mihoyo.com/communityweb/upload/222b847170feb3f2babcc1bd4f0e30dd.png"
           />
-          <el-button text class="ml-2">{{ userInfo.name }}<el-icon> <arrow-down /></el-icon></el-button>
-
+          <el-button text class="ml-2"
+            >{{ userInfo.nickname ? userInfo.nickname : userInfo.username
+            }}<el-icon> <arrow-down /></el-icon
+          ></el-button>
         </span>
         <template #dropdown>
           <el-dropdown-menu>
@@ -51,8 +84,9 @@
             v-model="theme.contentPadding"
             size="large"
             active-text="显示边距"
-          /> </el-col
-        ><el-col :span="24">
+          />
+        </el-col>
+        <el-col :span="24">
           <el-switch
             v-model="theme.showFooter"
             size="large"
@@ -65,23 +99,37 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowDown, FullScreen, Setting } from "@element-plus/icons-vue";
+import { ArrowDown, Bell, FullScreen, Setting } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
-import { watch } from "vue";
+import { onBeforeMount, watch } from "vue";
 import { useThemeStore } from "@/store/themeConfig";
 import { defaultTheme } from "@/constants/defaultTheme";
-
+import { getCommentsUnreadApi, getUserInfoApi } from "@/utils/apis";
+import { useUserStore } from "@/store/user";
+import { UserState } from "@/type/storeTypes";
+import { formatDate } from "@/utils/util";
 let router = useRouter();
 let { setThemeConfig } = useThemeStore();
-let userInfo = $ref({ name: "可莉" });
-let notice = $ref(`你好,${userInfo.name},今天要炸鱼吗?`);
+let userStore = useUserStore();
+let userInfo: UserState = computed(() => {
+  return userStore.$state;
+});
+function readAll(){
+
+}
+let notice = computed(() => {
+  return `你好,${
+    userStore.nickname ? userStore.nickname : userStore.username
+  },今天要炸鱼吗?`;
+});
+let comments = $ref([]);
 let settingDraw = $ref<boolean>(false);
 const theme = $(
   useStorage("themeConfig", {
     ...defaultTheme,
   })
 );
-
+let noticeTab = $ref("notice");
 const { isFullscreen, enter, exit, toggle } = useFullscreen();
 
 function showSettings() {
@@ -98,6 +146,21 @@ function logout() {
   localStorage.clear();
   router.push({ name: "login" });
 }
+
+async function getUnread() {
+  let data = await getCommentsUnreadApi();
+  comments = data.data;
+}
+
+async function getUser() {
+  let data = await getUserInfoApi();
+  userStore.setUserInfo(data.data);
+}
+
+onBeforeMount(async () => {
+  await getUser();
+  await getUnread();
+});
 watch(
   theme,
   (val, oldVal) => {
@@ -108,6 +171,23 @@ watch(
 </script>
 
 <style lang="scss" scoped>
+.notice-tab {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  .notice-head{
+    display: flex;
+
+  }
+  .notice-item {
+    width: 20rem;
+    display: flex;
+
+    &:hover {
+      background-color: rgb(243 244 246);
+    }
+  }
+}
 .header {
   height: 3rem;
   padding: 0.5rem 1rem;

@@ -281,7 +281,7 @@ func ProfileUpdate(c *gin.Context) {
 		return
 	}
 	res["succeed"] = true
-	res["user"] = models.User{AvatarUrl: avatarUrl, NickName: nickName}
+	res["user"] = models.User{AvatarUrl: avatarUrl, Nickname: nickName}
 }
 
 func BindEmail(c *gin.Context) {

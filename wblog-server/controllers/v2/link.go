@@ -25,7 +25,7 @@ func LinkCreate(c *gin.Context) {
 		res   = gin.H{}
 		_sort int64
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	name := c.PostForm("name")
 	url := c.PostForm("url")
 	sort := c.PostForm("sort")
@@ -110,7 +110,7 @@ func LinkDelete(c *gin.Context) {
 		_id uint64
 		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", true)
 	id := c.Param("id")
 	_id, err = strconv.ParseUint(id, 10, 64)
 	if err != nil {

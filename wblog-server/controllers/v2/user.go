@@ -321,7 +321,7 @@ func ProfileUpdate(c *gin.Context) {
 		return
 	}
 	res["succeed"] = true
-	res["user"] = models.User{AvatarUrl: avatarUrl, NickName: nickName}
+	res["user"] = models.User{AvatarUrl: avatarUrl, Nickname: nickName}
 }
 
 func BindEmail(c *gin.Context) {
@@ -402,13 +402,24 @@ func UnbindGithub(c *gin.Context) {
 	}
 	res["succeed"] = true
 }
+func UserInfo(c *gin.Context) {
+	userContext, exist := c.Get("user")
+	if !exist {
+		color.Danger.Println("失败了")
+	}
+	//查询用户组及该组的功能权限
+	user, ok := userContext.(models.User) //这个是类型推断,判断接口是什么类型
+	if !ok {
 
+		color.Danger.Println("断言失败")
+	}
+	helpers.JSON(c, http.StatusOK, "success", user)
+}
 func UserIndex(c *gin.Context) {
 	users, _ := models.ListUsers()
-	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
+	helpers.JSON(c, http.StatusOK, "获取成功", users)
 	c.HTML(http.StatusOK, "admin/user.html", gin.H{
 		"users":    users,
-		"user":     user,
 		"comments": models.MustListUnreadComment(),
 	})
 }

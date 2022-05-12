@@ -7,21 +7,21 @@ import (
 
 // table users
 type User struct {
-	gorm.Model
+	BaseModel
 	Uid           string    `json:"uid" gorm:"type:varchar(64);unique_index;"`
 	Username      string    `json:"username" gorm:"type:varchar(64);unique_index;"`
-	Email         string    `gorm:"unique_index;default:null"` //邮箱
-	Telephone     string    `gorm:"unique_index;default:null"` //手机号码
-	Password      string    `gorm:"default:null"`              //密码
-	VerifyState   string    `gorm:"default:'0'"`               //邮箱验证状态
-	SecretKey     string    `gorm:"default:null"`              //密钥
-	OutTime       time.Time //过期时间
-	GithubLoginId string    `gorm:"unique_index;default:null"` // github唯一标识
-	GithubUrl     string    //github地址
-	IsAdmin       bool      //是否是管理员
-	AvatarUrl     string    // 头像链接
-	NickName      string    // 昵称
-	LockState     bool      `gorm:"default:false"` //锁定状态
+	Email         string    `json:"email" gorm:"unique_index;default:null"`        //邮箱
+	Telephone     string    `json:"telephone"gorm:"unique_index;default:null"`     //手机号码
+	Password      string    `json:"password" gorm:"default:null"`                  //密码
+	VerifyState   string    `json:"verify_state" gorm:"default:'0'"`               //邮箱验证状态
+	SecretKey     string    `json:"secret_key"gorm:"default:null"`                 //密钥
+	OutTime       time.Time `json:"out_time"`                                      //过期时间
+	GithubLoginId string    `json:"githubLoginId"gorm:"unique_index;default:null"` // github唯一标识
+	GithubUrl     string    `json:"github_url"`                                    //github地址
+	IsAdmin       bool      `json:"is_admin"`                                      //是否是管理员
+	AvatarUrl     string    `json:"avatar_url"`                                    // 头像链接
+	Nickname      string    `json:"nickname" gorm:"nickname"`                      // 昵称
+	LockState     bool      `json:"lock_state" gorm:"default:false"`               //锁定状态
 }
 
 // user
@@ -61,7 +61,7 @@ func GetUser(id interface{}) (*User, error) {
 }
 
 func (user *User) UpdateProfile(avatarUrl, nickName string) error {
-	return DB.Model(user).Updates(User{AvatarUrl: avatarUrl, NickName: nickName}).Error
+	return DB.Model(user).Updates(User{AvatarUrl: avatarUrl, Nickname: nickName}).Error
 }
 
 func (user *User) UpdateEmail(email string) error {
