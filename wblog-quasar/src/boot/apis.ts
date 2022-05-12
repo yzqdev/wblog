@@ -10,3 +10,6 @@ export const getPosts = () => {
 export const getPostById = (id:string) => {
   return api.get(`/home/post/${id}`);
 };
+export const getLinks = ( ) => {
+  return api.get(`/home/links`);
+};

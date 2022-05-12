@@ -86,6 +86,12 @@ const linksList = $ref([
     link: 'tags'
   },
   {
+    title: '友情链接',
+    caption: '友情链接',
+    icon: 'code',
+    link: 'links'
+  },
+  {
     title: '关于',
     caption: '关于我',
     icon: 'code',

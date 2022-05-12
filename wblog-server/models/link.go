@@ -1,15 +1,16 @@
 package models
 
-import "gorm.io/gorm"
+import "time"
 
 // Link
 // table link
 type Link struct {
-	gorm.Model
-	Name string //名称
-	Url  string //地址
-	Sort int    `gorm:"default:0"` //排序
-	View int    //访问次数
+	BaseModel
+	DeletedAt time.Time `json:"deleted_at"`
+	Name      string    `json:"name"`                  //名称
+	Url       string    `json:"url"`                   //地址
+	Sort      int       `json:"sort" gorm:"default:0"` //排序
+	View      int       `json:"view"`                  //访问次数
 }
 
 func (link *Link) Insert() error {

@@ -26,6 +26,7 @@ func InitRouterV2(router *gin.Engine) {
 	{
 		homeRouter.GET("/posts", v2.PostIndex)
 		homeRouter.GET("/post/:id", v2.PostGet)
+		homeRouter.GET("/links", v2.LinkIndex)
 	}
 
 }
