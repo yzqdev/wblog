@@ -40,7 +40,6 @@ declare module '@vue/runtime-core' {
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTag: typeof import('element-plus/es')['ElTag']
-    ElTooltip: typeof import('element-plus/es')['ElTooltip']
     IconSelector: typeof import('./components/IconSelector.vue')['default']
     NotFound: typeof import('./components/NotFound.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

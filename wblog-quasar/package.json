@@ -6,7 +6,7 @@
   "author": "yzqdev <yzqdev@outlook.com>",
   "private": true,
   "scripts": {
-    "dev": "quasar dev -p 9060",
+    "dev": "quasar dev -m ssr -p 9060",
     "build": "quasar build -m ssr",
     "build:pwa": "quasar build -m pwa",
     "lint": "prettier --write src/**/*.{vue,ts,js,tsx,jsx}"
@@ -17,14 +17,15 @@
     "core-js": "^3.22.5",
     "dayjs": "^1.11.2",
     "md-editor-v3": "^1.11.12",
+    "pinia": "latest",
     "quasar": "^2.6.6",
     "vue": "^3.2.33",
-    "vue-router": "^4.0.15",
-    "vuex": "^4.0.2"
+    "vue-router": "^4.0.15"
   },
   "devDependencies": {
-    "@quasar/app": "^3.3.3",
-    "@types/node": "^17.0.32"
+    "@quasar/app-webpack": "^3.5.1",
+    "@types/node": "^17.0.32",
+    "workbox-webpack-plugin": "^6.0.0"
   },
   "browserslist": [
     "last 10 Chrome versions",

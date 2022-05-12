@@ -13,3 +13,8 @@ export const getPostById = (id:string) => {
 export const getLinks = ( ) => {
   return api.get(`/home/links`);
 };
+//comment
+
+export const postComment = (postId:string,data:any ) => {
+  return api.postForm(`/home/comment/${postId}`,data);
+};
