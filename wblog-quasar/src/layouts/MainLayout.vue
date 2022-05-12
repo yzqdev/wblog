@@ -22,7 +22,6 @@
 
         </template>
         <div>Quasar v{{ $q.version }}</div>
-        <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 
@@ -35,7 +34,7 @@
       <q-scroll-area style="height: calc(100% - 150px); margin-top: 150px; border-right: 1px solid #ddd">
         <q-list padding>
           <template v-for="item in linksList">
-            <q-item clickable active @click="gotoRoute(item)">
+            <q-item clickable :active="curActive==item.link"  @click="gotoRoute(item)">
               <q-item-section avatar>
                 <q-icon :name="item.icon"/>
               </q-item-section>
@@ -67,12 +66,11 @@
 
 <script setup lang="ts">
 import EssentialLink from 'components/EssentialLink.vue'
-import {useRouter} from "vue-router";
-import {Platform} from 'quasar'
-import {computed} from "vue";
-import {watch} from "fs";
+import {useRoute, useRouter} from "vue-router";
+import {computed, watch} from "vue";
 
 let router = useRouter()
+let route=useRoute()
 const linksList = $ref([
 
   {
@@ -88,20 +86,23 @@ const linksList = $ref([
     link: 'tags'
   },
   {
-    title: '博客列表',
-    caption: '我的博客列表',
+    title: '关于',
+    caption: '关于我',
     icon: 'code',
-    link: 'posts'
+    link: 'about'
   },
 
 ]);
 let leftDrawerOpen = $ref(false)
-
-
+ let curActive=$ref()
+watch(route ,(val)  => {
+  curActive=val.name
+},{ immediate: true } )
 function gotoRoute(item) {
   if (item.link.includes('http')) {
     location.assign(item.link)
   } else {
+    curActive=route.name
     router.push({name: item.link})
   }
 }

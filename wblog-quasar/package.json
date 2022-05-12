@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "quasar dev -p 9060",
     "build": "quasar build -m ssr",
-    "build:pwa": "quasar build -m pwa"
+    "build:pwa": "quasar build -m pwa",
+    "lint": "prettier --write src/**/*.{vue,ts,js,tsx,jsx}"
   },
   "dependencies": {
     "@quasar/extras": "^1.13.6",

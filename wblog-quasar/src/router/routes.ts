@@ -15,6 +15,14 @@ const routes: RouteRecordRaw[] = [
       path: 'post/:id',
       name:'post',
       component: () => import('pages/PostDetail.vue')
+    },{
+      path: 'about',
+      name:'about',
+      component: () => import('pages/About.vue')
+    },{
+      path: 'tags',
+      name:'tags',
+      component: () => import('pages/Tags.vue')
     }],
   },
 

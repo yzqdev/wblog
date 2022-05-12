@@ -1,6 +1,6 @@
 <template>
 <div class="posts">
- <q-card v-for="item in posts" class="posts-card" @click="gotoPost(item)">
+ <q-card v-for="item in posts" class="posts-card  q-pa-md " @click="gotoPost(item)">
     {{item.title}}
     <q-card-section>
 
@@ -40,7 +40,7 @@ function gotoPost(item) {
 
 <style lang="scss" scoped>
 .posts{
-  padding: 2rem;
+  padding: 1rem;
   .posts-card{
     margin: 1rem;
   }
