@@ -13,13 +13,13 @@ import (
 // table posts
 type Post struct {
 	BaseModel
-	Title        string     `json:"title"`                  // title
-	Body         string     `json:"body"`                   // body
-	View         int        `json:"view"`                   // view count
-	IsPublished  bool       `json:"is_published"`           // published or not
-	Tags         []*Tag     `json:"tags" gorm:"-"`          // tags of post
-	Comments     []*Comment `json:"comments" gorm:"-"`      // comments of post
-	CommentTotal int        `json:"comment_total" gorm:"-"` // count of comment
+	Title        string     `json:"title" gorm:"type:varchar(64);"` // title
+	Body         string     `json:"body" gorm:"type:varchar(64);"`  // body
+	View         int        `json:"view" gorm:"type:varchar(64);"`  // view count
+	IsPublished  bool       `json:"is_published" gorm:"type:bool;"` // published or not
+	Tags         []*Tag     `json:"tags" gorm:"-"`                  // tags of post
+	Comments     []*Comment `json:"comments" gorm:"-"`              // comments of post
+	CommentTotal int        `json:"comment_total" gorm:"-"`         // count of comment
 }
 
 // Post

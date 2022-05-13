@@ -54,6 +54,9 @@ type Configuration struct {
 	SmmsFileServer     string `mapstructure:"smms_fileserver"`
 	Zap                *Zap   `mapstructure:"zap"`
 	Mysql              *Mysql `mapstructure:"mysql"`
+	Pgsql              struct {
+		Pass string `mapstructure:"pass"`
+	}
 }
 
 const (

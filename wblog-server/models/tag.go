@@ -5,8 +5,8 @@ import "strconv"
 // table tags
 type Tag struct {
 	BaseModel
-	Name  string // tag name
-	Total int    `gorm:"-"` // count of post
+	Name  string `json:"name"  gorm:"type:varchar(64);"` // tag name
+	Total int    `gorm:"-"`                              // count of post
 }
 
 // Tag

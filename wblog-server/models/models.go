@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/gookit/color"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"time"
 	"wblog-server/system"
@@ -52,8 +52,9 @@ func InitDB() (*gorm.DB, error) {
 	g := system.GetConfiguration()
 	color.Redln("链接数据库")
 	color.Redln(g.Mysql)
-	dsn := g.Mysql.User + ":" + g.Mysql.Pass + "@tcp(127.0.0.1:3306)/" + g.Mysql.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	//dsn := g.Mysql.User + ":" + g.Mysql.Pass + "@tcp(127.0.0.1:3306)/" + g.Mysql.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "host=localhost user=postgres password=" + g.Pgsql.Pass + " dbname=wblog port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err == nil {
 		DB = db
 		//db.LogMode(true)

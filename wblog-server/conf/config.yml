@@ -3,6 +3,8 @@ mysql:
   name: wblog
   user: root
   pass: 123456
+pgsql:
+  pass: 123456
 zap:
   level: 'info'
   format: 'console'
