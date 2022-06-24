@@ -53,7 +53,6 @@ func LinkCreate(c *gin.Context) {
 
 func LinkUpdate(c *gin.Context) {
 	var (
-		_id   uint64
 		_sort int64
 		err   error
 		res   = gin.H{}
@@ -67,7 +66,6 @@ func LinkUpdate(c *gin.Context) {
 		res["message"] = "error parameter"
 		return
 	}
-	_id, err = strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		res["message"] = err.Error()
 		return
@@ -82,7 +80,7 @@ func LinkUpdate(c *gin.Context) {
 		Url:  url,
 		Sort: int(_sort),
 	}
-	link.ID = uint(_id)
+	link.ID = id
 	err = link.Update()
 	if err != nil {
 		res["message"] = err.Error()
@@ -107,19 +105,17 @@ func LinkGet(c *gin.Context) {
 func LinkDelete(c *gin.Context) {
 	var (
 		err error
-		_id uint64
 		res = gin.H{}
 	)
 	defer helpers.WriteJson(c, res)
 	id := c.Param("id")
-	_id, err = strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		res["message"] = err.Error()
 		return
 	}
 
 	link := new(models.Link)
-	link.ID = uint(_id)
+	link.ID = id
 	err = link.Delete()
 	if err != nil {
 		res["message"] = err.Error()

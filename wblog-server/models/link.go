@@ -7,10 +7,10 @@ import "time"
 type Link struct {
 	BaseModel
 	DeletedAt time.Time `json:"deleted_at" `
-	Name      string    `json:"name"  gorm:"type:varchar(64);"`     //名称
-	Url       string    `json:"url"  gorm:"type:varchar(64);"`      //地址
-	Sort      int       `json:"sort" gorm:"type:int(64);default:0"` //排序
-	View      int       `json:"view"  gorm:"type:int(64);"`         //访问次数
+	Name      string    `json:"name"  gorm:"type:varchar(64);"` //名称
+	Url       string    `json:"url"  gorm:"type:varchar(64);"`  //地址
+	Sort      int       `json:"sort" gorm:"type:int;default:0"` //排序
+	View      int       `json:"view"  gorm:"type:int;"`         //访问次数
 }
 
 func (link *Link) Insert() error {

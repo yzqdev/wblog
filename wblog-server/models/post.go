@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/rs/xid"
 	"github.com/russross/blackfriday"
 	"html/template"
 	"strconv"
@@ -14,8 +15,8 @@ import (
 type Post struct {
 	BaseModel
 	Title        string     `json:"title" gorm:"type:varchar(64);"` // title
-	Body         string     `json:"body" gorm:"type:varchar(64);"`  // body
-	View         int        `json:"view" gorm:"type:varchar(64);"`  // view count
+	Body         string     `json:"body" gorm:"type:text;"`         // body
+	View         int        `json:"view" gorm:"type:int8;"`         // view count
 	IsPublished  bool       `json:"is_published" gorm:"type:bool;"` // published or not
 	Tags         []*Tag     `json:"tags" gorm:"-"`                  // tags of post
 	Comments     []*Comment `json:"comments" gorm:"-"`              // comments of post
@@ -24,6 +25,7 @@ type Post struct {
 
 // Post
 func (post *Post) Insert() error {
+	post.ID = xid.New().String()
 	return DB.Create(post).Error
 }
 

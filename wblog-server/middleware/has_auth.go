@@ -28,7 +28,7 @@ func JwtHandler() gin.HandlerFunc {
 
 		// 校验token
 		adminUser, err := parseToken(auth)
-		context.Set("userId", adminUser.Uid)
+		context.Set("userId", adminUser)
 
 		if err != nil {
 			context.Abort()
@@ -42,7 +42,7 @@ func JwtHandler() gin.HandlerFunc {
 		context.Next()
 	}
 }
-func parseToken(yourToken string) (models.User, error) {
+func parseToken(yourToken string) (string, error) {
 	claims := controllers.NewJwtClaims{}
 	_, err := jwt.ParseWithClaims(yourToken, &claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -56,7 +56,7 @@ func parseToken(yourToken string) (models.User, error) {
 		color.Danger.Println("token值为空")
 
 	}
-	color.Danger.Println(claims.Username, "编译token")
-	return *claims.User, err
+	color.Danger.Println(claims.UserId, "获取token所存")
+	return claims.UserId, err
 
 }

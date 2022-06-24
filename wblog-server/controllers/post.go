@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 	"strings"
 	"wblog-server/helpers"
 
@@ -57,13 +56,10 @@ func PostCreate(c *gin.Context) {
 	if len(tags) > 0 {
 		tagArr := strings.Split(tags, ",")
 		for _, tag := range tagArr {
-			tagId, err := strconv.ParseUint(tag, 10, 64)
-			if err != nil {
-				continue
-			}
+
 			pt := &models.PostTag{
 				PostId: post.ID,
-				TagId:  uint(tagId),
+				TagId:  tag,
 			}
 			pt.Insert()
 		}
@@ -92,19 +88,13 @@ func PostUpdate(c *gin.Context) {
 	isPublished := c.PostForm("isPublished")
 	published := "on" == isPublished
 
-	pid, err := strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		helpers.Handle404(c)
-		return
-	}
-
 	post := &models.Post{
 		Title:       title,
 		Body:        body,
 		IsPublished: published,
 	}
-	post.ID = uint(pid)
-	err = post.Update()
+	post.ID = id
+	err := post.Update()
 	if err != nil {
 		c.HTML(http.StatusOK, "post/modify.html", gin.H{
 			"post":    post,
@@ -118,13 +108,10 @@ func PostUpdate(c *gin.Context) {
 	if len(tags) > 0 {
 		tagArr := strings.Split(tags, ",")
 		for _, tag := range tagArr {
-			tagId, err := strconv.ParseUint(tag, 10, 64)
-			if err != nil {
-				continue
-			}
+
 			pt := &models.PostTag{
 				PostId: post.ID,
-				TagId:  uint(tagId),
+				TagId:  tag,
 			}
 			pt.Insert()
 		}
@@ -161,19 +148,15 @@ func PostDelete(c *gin.Context) {
 	)
 	defer helpers.WriteJson(c, res)
 	id := c.Param("id")
-	pid, err := strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		res["message"] = err.Error()
-		return
-	}
+
 	post := &models.Post{}
-	post.ID = uint(pid)
+	post.ID = id
 	err = post.Delete()
 	if err != nil {
 		res["message"] = err.Error()
 		return
 	}
-	models.DeletePostTagByPostId(uint(pid))
+	models.DeletePostTagByPostId(id)
 	res["succeed"] = true
 }
 

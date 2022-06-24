@@ -73,12 +73,13 @@
           </el-button>
         </el-tab-pane>
       </el-tabs>
+      <el-button @click="initDb">初始化</el-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { loginApi, regApi } from "@/utils/apis";
+import { loginApi, regApi, initDbApi } from "@/utils/apis";
 import {
   defineComponent,
   onBeforeMount,
@@ -108,7 +109,15 @@ let regRule = $ref({
 let loginForm = $ref({ username: "", password: "" });
 let loginFormRef = ref(null);
 let regFormRef = ref(null);
-
+async function initDb() {
+  let res = await initDbApi();
+  if (res) {
+    ElMessage({
+      type: "success",
+      message: res,
+    });
+  }
+}
 function login() {
   loginFormRef.value.validate((valid: boolean) => {
     if (valid) {

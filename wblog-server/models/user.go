@@ -12,7 +12,7 @@ type User struct {
 	Username      string    `json:"username" gorm:"type:varchar(64);unique_index;"`
 	Email         string    `json:"email" gorm:"type:varchar(64);unique_index;default:null"`         //邮箱
 	Telephone     string    `json:"telephone"gorm:"type:varchar(64);unique_index;default:null"`      //手机号码
-	Password      string    `json:"password" gorm:"type:varchar(64);default:null"`                   //密码
+	Password      string    `json:"-" gorm:"type:varchar(64);default:null"`                          //密码
 	VerifyState   string    `json:"verify_state" gorm:"type:varchar(64);default:'0'"`                //邮箱验证状态
 	SecretKey     string    `json:"secret_key" gorm:"type:varchar(64);default:null"`                 //密钥
 	OutTime       time.Time `json:"out_time"`                                                        //过期时间
@@ -48,7 +48,7 @@ func (user *User) FirstOrCreate() (*User, error) {
 	return user, err
 }
 
-func IsGithubIdExists(githubId string, id uint) (*User, error) {
+func IsGithubIdExists(githubId string, id string) (*User, error) {
 	var user User
 	err := DB.First(&user, "github_login_id = ? and id != ?", githubId, id).Error
 	return &user, err

@@ -10,7 +10,7 @@ import (
 
 // BaseModel I don't need soft delete,so I use customized BaseModel instead gorm.Model
 type BaseModel struct {
-	ID        string    `json:"id" gorm:"primary_key"`
+	ID        string    `json:"id" gorm:"type:varchar(64);primaryKey"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -18,8 +18,8 @@ type BaseModel struct {
 // table post_tags
 type PostTag struct {
 	BaseModel
-	PostId uint // post id
-	TagId  uint // tag id
+	PostId string // post id
+	TagId  string // tag id
 
 }
 
@@ -62,6 +62,7 @@ func InitDB() (*gorm.DB, error) {
 		//db.Model(&PostTag{}).AddUniqueIndex("uk_post_tag", "post_id", "tag_id")
 		return db, err
 	}
+	CreateAdmin()
 	return nil, err
 }
 
@@ -70,7 +71,7 @@ func (pt *PostTag) Insert() error {
 	return DB.FirstOrCreate(pt, "post_id = ? and tag_id = ?", pt.PostId, pt.TagId).Error
 }
 
-func DeletePostTagByPostId(postId uint) error {
+func DeletePostTagByPostId(postId string) error {
 	return DB.Delete(&PostTag{}, "post_id = ?", postId).Error
 }
 

@@ -58,7 +58,7 @@ type LoginUser struct {
 	Password string `json:"password"`
 }
 type NewJwtClaims struct {
-	*models.User
+	UserId string
 	jwt.StandardClaims
 }
 
@@ -68,7 +68,10 @@ func LogoutGet(c *gin.Context) {
 	s.Save()
 	c.Redirect(http.StatusSeeOther, "/signin")
 }
-
+func InitPage(c *gin.Context) {
+	models.CreateAdmin()
+	c.JSON(200, "success")
+}
 func SignupPost(c *gin.Context) {
 	var (
 		err error
@@ -141,12 +144,12 @@ func SigninPost(c *gin.Context) {
 			ExpiresAt: expiresTime,       // 失效时间
 			Id:        "id",              // 编号
 			IssuedAt:  time.Now().Unix(), // 签发时间
-			Issuer:    "sqlU.Username",   // 签发人
+			Issuer:    "yzqdev",          // 签发人
 			NotBefore: time.Now().Unix(), // 生效时间
 			Subject:   "login",           // 主题
 		}
 		newClaims := NewJwtClaims{
-			User:           user,
+			UserId:         user.Uid,
 			StandardClaims: stdClaims,
 		}
 		tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, newClaims)

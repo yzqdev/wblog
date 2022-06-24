@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 	"wblog-server/helpers"
 
 	"github.com/gin-gonic/gin"
@@ -65,14 +64,10 @@ func PageUpdate(c *gin.Context) {
 	body := c.PostForm("body")
 	isPublished := c.PostForm("isPublished")
 	published := "on" == isPublished
-	pid, err := strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
+
 	page := &models.Page{Title: title, Body: body, IsPublished: published}
-	page.ID = uint(pid)
-	err = page.Update()
+	page.ID = id
+	err := page.Update()
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -108,13 +103,9 @@ func PageDelete(c *gin.Context) {
 	)
 	defer helpers.WriteJson(c, res)
 	id := c.Param("id")
-	pid, err := strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		res["message"] = err.Error()
-		return
-	}
+
 	page := &models.Page{}
-	page.ID = uint(pid)
+	page.ID = id
 	err = page.Delete()
 	if err != nil {
 		res["message"] = err.Error()

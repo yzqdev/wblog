@@ -1,5 +1,8 @@
 import http from "./http";
-import {comments} from "@/utils/mockData";
+import { comments } from "@/utils/mockData";
+export function initDbApi() {
+  return http.get("/auth/init");
+}
 export const postApi = (msg: any) => {
   return http.postForm("/admin/posts", msg);
 };
@@ -20,7 +23,6 @@ export const delPostsApi = (id: string) => {
 };
 //comment
 export function getCommentsUnreadApi() {
-
   return http.get("/admin/comment/unread");
 }
 

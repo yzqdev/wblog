@@ -62,7 +62,6 @@ func CommentDelete(c *gin.Context) {
 	var (
 		err error
 		res = gin.H{}
-		cid uint64
 	)
 	defer helpers.WriteJson(c, res)
 
@@ -71,15 +70,11 @@ func CommentDelete(c *gin.Context) {
 	userId, _ := sessionUserID.(uint)
 
 	commentId := c.Param("id")
-	cid, err = strconv.ParseUint(commentId, 10, 64)
-	if err != nil {
-		res["message"] = err.Error()
-		return
-	}
+
 	comment := &models.Comment{
 		UserID: uint(userId),
 	}
-	comment.ID = uint(cid)
+	comment.ID = commentId
 	err = comment.Delete()
 	if err != nil {
 		res["message"] = err.Error()
@@ -95,19 +90,17 @@ func ListCommentUnRead(c *gin.Context) {
 func CommentRead(c *gin.Context) {
 	var (
 		id  string
-		_id uint64
 		err error
 		res = gin.H{}
 	)
 	defer helpers.WriteJson(c, res)
 	id = c.Param("id")
-	_id, err = strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		res["message"] = err.Error()
 		return
 	}
 	comment := new(models.Comment)
-	comment.ID = uint(_id)
+	comment.ID = id
 	err = comment.Update()
 	if err != nil {
 		res["message"] = err.Error()

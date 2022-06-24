@@ -15,6 +15,7 @@ func InitRouterV2(router *gin.Engine) {
 	{
 		auth.POST("/login", v2.SigninPost)
 		auth.POST("/reg", v2.SignupPost)
+		auth.GET("/init", v2.InitPage)
 
 	}
 	adminRouter := v2Router.Group("/admin", middleware.JwtHandler())
