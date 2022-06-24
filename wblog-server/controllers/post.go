@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/gookit/color"
 	"net/http"
 	"strings"
 	"wblog-server/helpers"
@@ -20,24 +21,17 @@ func PostGet(c *gin.Context) {
 	post.UpdateView()
 	post.Tags, _ = models.ListTagByPostId(id)
 	post.Comments, _ = models.ListCommentByPostID(id)
-	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
-	c.HTML(http.StatusOK, "post/display.html", gin.H{
-		"post": post,
-		"user": user,
-	})
-}
-
-func PostNew(c *gin.Context) {
-	c.HTML(http.StatusOK, "post/new.html", nil)
+	helpers.JSON(c, http.StatusOK, "获取成功", post)
 }
 
 func PostCreate(c *gin.Context) {
 	tags := c.PostForm("tags")
 	title := c.PostForm("title")
 	body := c.PostForm("body")
-	isPublished := c.PostForm("isPublished")
-	published := "on" == isPublished
-
+	isPublished := c.PostForm("is_published")
+	published := "true" == isPublished
+	color.Redln(isPublished)
+	color.Redln("发布")
 	post := &models.Post{
 		Title:       title,
 		Body:        body,
@@ -45,7 +39,7 @@ func PostCreate(c *gin.Context) {
 	}
 	err := post.Insert()
 	if err != nil {
-		c.HTML(http.StatusOK, "post/new.html", gin.H{
+		helpers.JSON(c, http.StatusInternalServerError, "失败", gin.H{
 			"post":    post,
 			"message": err.Error(),
 		})
@@ -64,7 +58,8 @@ func PostCreate(c *gin.Context) {
 			pt.Insert()
 		}
 	}
-	c.Redirect(http.StatusMovedPermanently, "/admin/post")
+	helpers.JSON(c, http.StatusOK, "成功", true)
+	//c.Redirect(http.StatusMovedPermanently, "/admin/post")
 }
 
 func PostEdit(c *gin.Context) {
@@ -75,7 +70,7 @@ func PostEdit(c *gin.Context) {
 		return
 	}
 	post.Tags, _ = models.ListTagByPostId(id)
-	c.HTML(http.StatusOK, "post/modify.html", gin.H{
+	helpers.JSON(c, http.StatusOK, "post/modify.html", gin.H{
 		"post": post,
 	})
 }
@@ -96,7 +91,7 @@ func PostUpdate(c *gin.Context) {
 	post.ID = id
 	err := post.Update()
 	if err != nil {
-		c.HTML(http.StatusOK, "post/modify.html", gin.H{
+		helpers.JSON(c, http.StatusOK, "post/modify.html", gin.H{
 			"post":    post,
 			"message": err.Error(),
 		})
@@ -146,9 +141,12 @@ func PostDelete(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "成功", res)
 	id := c.Param("id")
-
+	if err != nil {
+		res["message"] = err.Error()
+		return
+	}
 	post := &models.Post{}
 	post.ID = id
 	err = post.Delete()
@@ -163,10 +161,11 @@ func PostDelete(c *gin.Context) {
 func PostIndex(c *gin.Context) {
 	posts, _ := models.ListAllPost("")
 	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
-	c.HTML(http.StatusOK, "admin/post.html", gin.H{
+	helpers.JSON(c, http.StatusOK, "获取成功", gin.H{
 		"posts":    posts,
 		"Active":   "posts",
 		"user":     user,
 		"comments": models.MustListUnreadComment(),
 	})
+
 }

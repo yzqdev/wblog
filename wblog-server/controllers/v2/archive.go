@@ -1,4 +1,4 @@
-package controllers
+package v2
 
 import (
 	"github.com/gin-gonic/gin"
@@ -7,6 +7,7 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+	"wblog-server/helpers"
 	"wblog-server/models"
 	"wblog-server/system"
 )
@@ -45,7 +46,7 @@ func ArchiveGet(c *gin.Context) {
 		post.Tags, _ = models.ListTagByPostId(post.ID)
 		post.Body = policy.Sanitize(string(blackfriday.MarkdownCommon([]byte(post.Body))))
 	}
-	c.HTML(http.StatusOK, "index/index.html", gin.H{
+	helpers.JSON(c, http.StatusOK, "index/index.html", gin.H{
 		"posts":           posts,
 		"tags":            models.MustListTag(),
 		"archives":        models.MustListPostArchives(),

@@ -13,29 +13,29 @@ func InitRouterV2(router *gin.Engine) {
 	v2Router := router.Group("v2")
 	auth := v2Router.Group("/auth")
 	{
-		auth.POST("/login", v2.SigninPost)
-		auth.POST("/reg", v2.SignupPost)
-		auth.GET("/init", v2.InitPage)
+		auth.POST("/login", controllers.SigninPost)
+		auth.POST("/reg", controllers.SignupPost)
+		auth.GET("/init", controllers.InitPage)
 
 	}
 	adminRouter := v2Router.Group("/admin", middleware.JwtHandler())
 	{
-		adminRouter.GET("/userInfo", v2.UserInfo)
-		adminRouter.GET("/posts", v2.PostIndex)
-		adminRouter.POST("/posts", v2.PostCreate)
-		adminRouter.DELETE("/posts/:id", v2.PostDelete)
-		adminRouter.GET("/links", v2.LinkIndex)
-		adminRouter.POST("/link", v2.LinkCreate)
-		adminRouter.DELETE("/link/:id", v2.LinkDelete)
-		adminRouter.GET("/comment/unread", v2.ListCommentUnRead)
+		adminRouter.GET("/userInfo", controllers.UserInfo)
+		adminRouter.GET("/posts", controllers.PostIndex)
+		adminRouter.POST("/posts", controllers.PostCreate)
+		adminRouter.DELETE("/posts/:id", controllers.PostDelete)
+		adminRouter.GET("/links", controllers.LinkIndex)
+		adminRouter.POST("/link", controllers.LinkCreate)
+		adminRouter.DELETE("/link/:id", controllers.LinkDelete)
+		adminRouter.GET("/comment/unread", controllers.ListCommentUnRead)
 	}
 	homeRouter := v2Router.Group("/home")
 	{
-		homeRouter.GET("/posts", v2.PostIndex)
-		homeRouter.GET("/post/:id", v2.PostGet)
-		homeRouter.GET("/links", v2.LinkIndex)
+		homeRouter.GET("/posts", controllers.PostIndex)
+		homeRouter.GET("/post/:id", controllers.PostGet)
+		homeRouter.GET("/links", controllers.LinkIndex)
 
-		homeRouter.POST("/comment/:postId", v2.CommentPost)
+		homeRouter.POST("/comment/:postId", controllers.CommentPost)
 	}
 
 }
@@ -46,11 +46,9 @@ func InitRouter(router *gin.Engine) {
 
 	if system.GetConfiguration().Reg {
 		color.Redln("允许注册!")
-		router.GET("/signup", controllers.SignupGet)
 		router.POST("/signup", controllers.SignupPost)
 	}
 	// user signin and logout
-	router.GET("/signin", controllers.SigninGet)
 	router.POST("/signin", controllers.SigninPost)
 	router.GET("/logout", controllers.LogoutGet)
 	router.GET("/oauth2callback", controllers.Oauth2Callback)
@@ -75,7 +73,7 @@ func InitRouter(router *gin.Engine) {
 	router.GET("/page/:id", controllers.PageGet)
 	router.GET("/post/:id", controllers.PostGet)
 	router.GET("/tag/:tag", controllers.TagGet)
-	router.GET("/archives/:year/:month", controllers.ArchiveGet)
+	router.GET("/archives/:year/:month", v2.ArchiveGet)
 
 	router.GET("/link/:id", controllers.LinkGet)
 
@@ -99,7 +97,6 @@ func InitRouter(router *gin.Engine) {
 
 		// post
 		authorized.GET("/post", controllers.PostIndex)
-		authorized.GET("/new_post", controllers.PostNew)
 		authorized.POST("/new_post", controllers.PostCreate)
 		authorized.GET("/post/:id/edit", controllers.PostEdit)
 		authorized.POST("/post/:id/edit", controllers.PostUpdate)

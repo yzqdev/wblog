@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"net/http"
 	"strings"
 	"wblog-server/helpers"
 
@@ -17,7 +18,7 @@ func SendMail(c *gin.Context) {
 		uid        uint64
 		subscriber *models.Subscriber
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	subject := c.PostForm("subject")
 	content := c.PostForm("content")
 	userId := c.Query("userId")
@@ -51,7 +52,7 @@ func SendBatchMail(c *gin.Context) {
 		subscribers []*models.Subscriber
 		emails      = make([]string, 0)
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	subject := c.PostForm("subject")
 	content := c.PostForm("content")
 	if subject == "" || content == "" {

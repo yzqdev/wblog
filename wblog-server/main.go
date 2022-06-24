@@ -31,7 +31,6 @@ func main() {
 
 	gin.SetMode(gin.DebugMode)
 	router := gin.Default()
-	Static(router)
 	setTemplate(router)
 	setSessions(router)
 	router.Use(SharedData())
@@ -125,7 +124,7 @@ func AdminScopeRequired() gin.HandlerFunc {
 			}
 		}
 		system.BlogLog.Warn("User not authorized to visit  " + c.Request.RequestURI)
-		c.HTML(http.StatusForbidden, "errors/error.html", gin.H{
+		helpers.JSON(c, http.StatusForbidden, "errors/error.html", gin.H{
 			"message": "Forbidden!",
 		})
 		c.Abort()
@@ -141,7 +140,7 @@ func AuthRequired() gin.HandlerFunc {
 			}
 		}
 		system.BlogLog.Warn("User not authorized to visit  " + c.Request.RequestURI)
-		c.HTML(http.StatusForbidden, "errors/error.html", gin.H{
+		helpers.JSON(c, http.StatusForbidden, "errors/error.html", gin.H{
 			"message": "Forbidden!",
 		})
 		c.Abort()

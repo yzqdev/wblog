@@ -17,13 +17,13 @@ func PageGet(c *gin.Context) {
 	}
 	page.View++
 	page.UpdateView()
-	c.HTML(http.StatusOK, "page/display.html", gin.H{
+	helpers.JSON(c, http.StatusOK, "page/display.html", gin.H{
 		"page": page,
 	})
 }
 
 func PageNew(c *gin.Context) {
-	c.HTML(http.StatusOK, "page/new.html", nil)
+	helpers.JSON(c, http.StatusOK, "page/new.html", nil)
 }
 
 func PageCreate(c *gin.Context) {
@@ -38,7 +38,7 @@ func PageCreate(c *gin.Context) {
 	}
 	err := page.Insert()
 	if err != nil {
-		c.HTML(http.StatusOK, "page/new.html", gin.H{
+		helpers.JSON(c, http.StatusOK, "page/new.html", gin.H{
 			"message": err.Error(),
 			"page":    page,
 		})
@@ -53,7 +53,7 @@ func PageEdit(c *gin.Context) {
 	if err != nil {
 		helpers.Handle404(c)
 	}
-	c.HTML(http.StatusOK, "page/modify.html", gin.H{
+	helpers.JSON(c, http.StatusOK, "page/modify.html", gin.H{
 		"page": page,
 	})
 }
@@ -117,7 +117,7 @@ func PageDelete(c *gin.Context) {
 func PageIndex(c *gin.Context) {
 	pages, _ := models.ListAllPage()
 	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
-	c.HTML(http.StatusOK, "admin/page.html", gin.H{
+	helpers.JSON(c, http.StatusOK, "admin/page.html", gin.H{
 		"pages":    pages,
 		"user":     user,
 		"comments": models.MustListUnreadComment(),

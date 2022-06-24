@@ -23,7 +23,7 @@ func Handle404(c *gin.Context) {
 }
 
 func HandleMessage(c *gin.Context, message string) {
-	c.HTML(http.StatusNotFound, "errors/error.html", gin.H{
+	JSON(c, http.StatusNotFound, "errors/error.html", gin.H{
 		"message": message,
 	})
 }

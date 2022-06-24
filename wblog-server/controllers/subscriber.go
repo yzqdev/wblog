@@ -14,7 +14,7 @@ import (
 
 func SubscribeGet(c *gin.Context) {
 	count, _ := models.CountSubscriber()
-	c.HTML(http.StatusOK, "other/subscribe.html", gin.H{
+	helpers.JSON(c, http.StatusOK, "other/subscribe.html", gin.H{
 		"total": count,
 	})
 }
@@ -30,7 +30,7 @@ func Subscribe(c *gin.Context) {
 				err = sendActiveEmail(subscriber)
 				if err == nil {
 					count, _ := models.CountSubscriber()
-					c.HTML(http.StatusOK, "other/subscribe.html", gin.H{
+					helpers.JSON(c, http.StatusOK, "other/subscribe.html", gin.H{
 						"message": "subscribe succeed.",
 						"total":   count,
 					})
@@ -54,7 +54,7 @@ func Subscribe(c *gin.Context) {
 				err = sendActiveEmail(subscriber)
 				if err == nil {
 					count, _ := models.CountSubscriber()
-					c.HTML(http.StatusOK, "other/subscribe.html", gin.H{
+					helpers.JSON(c, http.StatusOK, "other/subscribe.html", gin.H{
 						"message": "subscribe succeed.",
 						"total":   count,
 					})
@@ -66,7 +66,7 @@ func Subscribe(c *gin.Context) {
 		err = errors.New("empty mail address.")
 	}
 	count, _ := models.CountSubscriber()
-	c.HTML(http.StatusOK, "other/subscribe.html", gin.H{
+	helpers.JSON(c, http.StatusOK, "other/subscribe.html", gin.H{
 		"message": err.Error(),
 		"total":   count,
 	})
@@ -168,7 +168,7 @@ func sendEmailToSubscribers(subject, body string) (err error) {
 func SubscriberIndex(c *gin.Context) {
 	subscribers, _ := models.ListSubscriber(false)
 	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
-	c.HTML(http.StatusOK, "admin/subscriber.html", gin.H{
+	helpers.JSON(c, http.StatusOK, "admin/subscriber.html", gin.H{
 		"subscribers": subscribers,
 		"user":        user,
 		"comments":    models.MustListUnreadComment(),
@@ -181,7 +181,7 @@ func SubscriberPost(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	mail := c.PostForm("mail")
 	subject := c.PostForm("subject")
 	body := c.PostForm("body")

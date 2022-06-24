@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"github.com/gookit/color"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 	"wblog-server/helpers"
 	"wblog-server/models"
 	"wblog-server/system"
@@ -49,12 +51,15 @@ type GithubUserInfo struct {
 	URL               string      `json:"url"`
 }
 
-func SigninGet(c *gin.Context) {
-	c.HTML(http.StatusOK, "auth/signin.html", nil)
-}
+var SecretKey = []byte("9hUxqaGelNnCZaCW")
 
-func SignupGet(c *gin.Context) {
-	c.HTML(http.StatusOK, "auth/signup.html", nil)
+type LoginUser struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+type NewJwtClaims struct {
+	UserId string
+	jwt.StandardClaims
 }
 
 func LogoutGet(c *gin.Context) {
@@ -63,33 +68,36 @@ func LogoutGet(c *gin.Context) {
 	s.Save()
 	c.Redirect(http.StatusSeeOther, "/signin")
 }
-
+func InitPage(c *gin.Context) {
+	models.CreateAdmin()
+	c.JSON(200, "success")
+}
 func SignupPost(c *gin.Context) {
 	var (
 		err error
-		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
-	email := c.PostForm("email")
-	telephone := c.PostForm("telephone")
-	password := c.PostForm("password")
-	user := &models.User{
-		Email:     email,
-		Telephone: telephone,
-		Password:  password,
-		IsAdmin:   true,
+	loginUser := &LoginUser{}
+	if err = c.ShouldBindJSON(loginUser); err != nil {
+		color.Redln("解析json失败")
 	}
-	if len(user.Email) == 0 || len(user.Password) == 0 {
-		res["message"] = "email or password cannot be null"
+	user := &models.User{
+		Uid:      helpers.UUID(),
+		Username: loginUser.Username,
+		Password: loginUser.Password,
+		IsAdmin:  true,
+	}
+	if len(user.Username) == 0 || len(user.Password) == 0 {
+		helpers.JSON(c, http.StatusOK, "username or password cannot be null", false)
 		return
 	}
-	user.Password = helpers.Md5(user.Email + user.Password)
+	user.Password = helpers.Md5(user.Username + user.Password)
 	err = user.Insert()
 	if err != nil {
-		res["message"] = "邮箱已存在"
+		helpers.JSON(c, http.StatusOK, "邮箱已存在", false)
 		return
 	}
-	res["succeed"] = true
+	helpers.JSON(c, http.StatusOK, "注册成功", true)
+
 }
 
 func SigninPost(c *gin.Context) {
@@ -97,36 +105,70 @@ func SigninPost(c *gin.Context) {
 		err  error
 		user *models.User
 	)
-	username := c.PostForm("username")
-	password := c.PostForm("password")
+	loginUser := &LoginUser{}
+	if err = c.ShouldBindJSON(loginUser); err != nil {
+		color.Redln("解析json失败")
+	}
+	username := loginUser.Username
+	password := loginUser.Password
 	if username == "" || password == "" {
-		c.HTML(http.StatusOK, "auth/signin.html", gin.H{
-			"message": "username or password cannot be null",
-		})
+		helpers.JSON(c, http.StatusBadRequest, "username or password cannot be null", false)
 		return
 	}
 	color.Redln(helpers.Md5(username + password))
 	user, err = models.GetUserByUsername(username)
 	if err != nil || user.Password != helpers.Md5(username+password) {
-		c.HTML(http.StatusOK, "auth/signin.html", gin.H{
-			"message": "用户名或者密码不合法",
-		})
+		helpers.JSON(c, http.StatusUnauthorized, "invalid username or password", false)
 		return
 	}
 	if user.LockState {
-		c.HTML(http.StatusOK, "auth/signin.html", gin.H{
-			"message": "Your account have been locked",
-		})
+		helpers.JSON(c, http.StatusForbidden, "Your account have been locked", false)
 		return
 	}
-	s := sessions.Default(c)
-	s.Clear()
-	s.Set(helpers.SESSION_KEY, user.ID)
-	s.Save()
+
 	if user.IsAdmin {
-		c.Redirect(http.StatusMovedPermanently, "/admin/index")
+		expiresTime := time.Now().Unix() + int64(60*60*24)
+		//claims := jwt.StandardClaims{
+		//	Audience:  user.Username,          // 受众
+		//	ExpiresAt: expiresTime,            // 失效时间
+		//	Id:        string(rune(user.Uid)), // 编号
+		//	IssuedAt:  time.Now().Unix(),      // 签发时间
+		//	Issuer:    sqlU.Username,            // 签发人
+		//	NotBefore: time.Now().Unix(),      // 生效时间
+		//	Subject:   "login",                // 主题
+		//}
+
+		stdClaims := jwt.StandardClaims{
+
+			Audience:  "啊啊啊",             // 受众
+			ExpiresAt: expiresTime,       // 失效时间
+			Id:        "id",              // 编号
+			IssuedAt:  time.Now().Unix(), // 签发时间
+			Issuer:    "yzqdev",          // 签发人
+			NotBefore: time.Now().Unix(), // 生效时间
+			Subject:   "login",           // 主题
+		}
+		newClaims := NewJwtClaims{
+			UserId:         user.Uid,
+			StandardClaims: stdClaims,
+		}
+		tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, newClaims)
+		if token, err := tokenClaims.SignedString(SecretKey); err == nil {
+			helpers.JSON(c, http.StatusOK, "true", map[string]interface{}{
+				"isAdmin": true,
+				"token":   token,
+				"path":    "/admin/index",
+			})
+		} else {
+
+			helpers.JSON(c, http.StatusOK, "登录失败，请重新登陆", false)
+		}
+
 	} else {
-		c.Redirect(http.StatusMovedPermanently, "/")
+		helpers.JSON(c, http.StatusOK, "true", map[string]interface{}{
+			"isAdmin": false,
+			"path":    "/",
+		})
 	}
 }
 
@@ -151,7 +193,7 @@ func Oauth2Callback(c *gin.Context) {
 	// exchange accesstoken by code
 	token, err := exchangeTokenByCode(code)
 	if err != nil {
-		system.BlogLog.Error("exchangeTOken error", zap.Error(err))
+		system.BlogLog.Error("exchange token error", zap.Error(err))
 		c.Redirect(http.StatusMovedPermanently, "/signin")
 		return
 	}
@@ -159,7 +201,7 @@ func Oauth2Callback(c *gin.Context) {
 	//get github userinfo by accesstoken
 	userInfo, err = getGithubUserInfoByAccessToken(token)
 	if err != nil {
-		system.BlogLog.Error("github错误", zap.Error(err))
+		system.BlogLog.Error("get github use error", zap.Error(err))
 		c.Redirect(http.StatusMovedPermanently, "/signin")
 		return
 	}
@@ -228,7 +270,7 @@ func exchangeTokenByCode(code string) (accessToken string, err error) {
 	// cache token
 	tokenCache := helpers.CacheFile("./request.token")
 	if err := tokenCache.PutToken(token); err != nil {
-		system.BlogLog.Error("token错误", zap.Error(err))
+		system.BlogLog.Error("request token err", zap.Error(err))
 	}
 	return
 }
@@ -256,7 +298,7 @@ func getGithubUserInfoByAccessToken(token string) (*GithubUserInfo, error) {
 func ProfileGet(c *gin.Context) {
 	sessionUser, exists := c.Get(helpers.CONTEXT_USER_KEY)
 	if exists {
-		c.HTML(http.StatusOK, "admin/profile.html", gin.H{
+		helpers.JSON(c, http.StatusOK, "admin/profile.html", gin.H{
 			"user":     sessionUser,
 			"comments": models.MustListUnreadComment(),
 		})
@@ -364,13 +406,25 @@ func UnbindGithub(c *gin.Context) {
 	}
 	res["succeed"] = true
 }
+func UserInfo(c *gin.Context) {
+	userContext, exist := c.Get("userId")
+	if !exist {
+		color.Danger.Println("失败了")
+	}
+	//查询用户组及该组的功能权限
+	userId, ok := userContext.(string) //这个是类型推断,判断接口是什么类型
+	if !ok {
 
+		color.Danger.Println("断言失败")
+	}
+	sqlUser, _ := models.GetUserByUid(userId)
+	helpers.JSON(c, http.StatusOK, "success", sqlUser)
+}
 func UserIndex(c *gin.Context) {
 	users, _ := models.ListUsers()
-	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
-	c.HTML(http.StatusOK, "admin/user.html", gin.H{
+	helpers.JSON(c, http.StatusOK, "获取成功", users)
+	helpers.JSON(c, http.StatusOK, "admin/user.html", gin.H{
 		"users":    users,
-		"user":     user,
 		"comments": models.MustListUnreadComment(),
 	})
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/gookit/color"
 	"net/http"
-	"wblog-server/controllers/v2"
+	"wblog-server/controllers"
 	"wblog-server/models"
 )
 

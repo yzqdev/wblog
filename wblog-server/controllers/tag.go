@@ -17,7 +17,7 @@ func TagCreate(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	name := c.PostForm("value")
 	tag := &models.Tag{Name: name}
 	err = tag.Insert()
@@ -61,7 +61,7 @@ func TagGet(c *gin.Context) {
 		post.Tags, _ = models.ListTagByPostId(post.ID)
 		post.Body = policy.Sanitize(string(blackfriday.MarkdownCommon([]byte(post.Body))))
 	}
-	c.HTML(http.StatusOK, "index/index.html", gin.H{
+	helpers.JSON(c, http.StatusOK, "success", gin.H{
 		"posts":           posts,
 		"tags":            models.MustListTag(),
 		"archives":        models.MustListPostArchives(),

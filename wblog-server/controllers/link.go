@@ -11,12 +11,12 @@ import (
 
 func LinkIndex(c *gin.Context) {
 	links, _ := models.ListLinks()
-	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
-	c.HTML(http.StatusOK, "admin/link.html", gin.H{
-		"links":    links,
-		"user":     user,
-		"comments": models.MustListUnreadComment(),
-	})
+	helpers.JSON(c, http.StatusOK, "success", links)
+	//c.HTML(http.StatusOK, "admin/link.html", gin.H{
+	//	"links":    links,
+	//	"user":     user,
+	//	"comments": models.MustListUnreadComment(),
+	//})
 }
 
 func LinkCreate(c *gin.Context) {
@@ -25,7 +25,7 @@ func LinkCreate(c *gin.Context) {
 		res   = gin.H{}
 		_sort int64
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	name := c.PostForm("name")
 	url := c.PostForm("url")
 	sort := c.PostForm("sort")
@@ -107,7 +107,7 @@ func LinkDelete(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", true)
 	id := c.Param("id")
 	if err != nil {
 		res["message"] = err.Error()
