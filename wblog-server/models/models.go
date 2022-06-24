@@ -10,7 +10,7 @@ import (
 
 // BaseModel I don't need soft delete,so I use customized BaseModel instead gorm.Model
 type BaseModel struct {
-	ID        uint      `json:"id" gorm:"primary_key"`
+	ID        string    `json:"id" gorm:"primary_key"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

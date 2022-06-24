@@ -10,33 +10,33 @@
     "lint": "prettier --write src/**/*.{vue,js,jsx,ts,tsx,json,html}"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "^1.1.4",
-    "@types/node": "latest",
-    "@types/qs": "^6.9.7",
+    "@element-plus/icons-vue": "^2.0.6",
     "@vicons/ionicons5": "^0.12.0",
     "@vueuse/core": "latest",
     "@vueuse/head": "^0.7.6",
     "axios": "latest",
-    "dayjs": "^1.11.2",
-    "echarts": "^5.3.2",
+    "dayjs": "^1.11.3",
+    "echarts": "^5.3.3",
     "element-plus": "latest",
-    "md-editor-v3": "^1.11.12",
+    "md-editor-v3": "^2.2.0",
     "pinia": "latest",
     "prettier": "latest",
-    "qs": "^6.10.3",
+    "qs": "^6.10.5",
     "sass": "latest",
-    "unplugin-auto-import": "latest",
-    "unplugin-vue-components": "^0.19.3",
     "vue": "latest",
     "vue-router": "latest"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^2.3.2",
+    "unplugin-auto-import": "latest",
+    "unplugin-vue-components": "^0.19.9",
+    "@types/node": "latest",
+    "@types/qs": "^6.9.7",
+    "@vitejs/plugin-vue": "^2.3.3",
     "autoprefixer": "^10.4.7",
-    "postcss": "^8.4.13",
-    "tailwindcss": "^3.0.24",
-    "typescript": "^4.6.4",
-    "vite": "latest",
-    "vue-tsc": "^0.34.11"
+    "postcss": "^8.4.14",
+    "tailwindcss": "^3.1.4",
+    "typescript": "^4.7.4",
+    "vite": "3",
+    "vue-tsc": "^0.38.1"
   }
 }

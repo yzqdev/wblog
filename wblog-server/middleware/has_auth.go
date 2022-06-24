@@ -28,7 +28,7 @@ func JwtHandler() gin.HandlerFunc {
 
 		// 校验token
 		adminUser, err := parseToken(auth)
-		context.Set("user", adminUser)
+		context.Set("userId", adminUser.Uid)
 
 		if err != nil {
 			context.Abort()

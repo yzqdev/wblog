@@ -59,6 +59,11 @@ func GetUser(id interface{}) (*User, error) {
 	err := DB.First(&user, id).Error
 	return &user, err
 }
+func GetUserByUid(id interface{}) (*User, error) {
+	var user User
+	err := DB.First(&user, "uid=?", id).Error
+	return &user, err
+}
 
 func (user *User) UpdateProfile(avatarUrl, nickName string) error {
 	return DB.Model(user).Updates(User{AvatarUrl: avatarUrl, Nickname: nickName}).Error

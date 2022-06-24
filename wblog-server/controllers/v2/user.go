@@ -112,6 +112,7 @@ func SigninPost(c *gin.Context) {
 		helpers.JSON(c, http.StatusBadRequest, "username or password cannot be null", false)
 		return
 	}
+	color.Redln(helpers.Md5(username + password))
 	user, err = models.GetUserByUsername(username)
 	if err != nil || user.Password != helpers.Md5(username+password) {
 		helpers.JSON(c, http.StatusUnauthorized, "invalid username or password", false)
@@ -403,17 +404,18 @@ func UnbindGithub(c *gin.Context) {
 	res["succeed"] = true
 }
 func UserInfo(c *gin.Context) {
-	userContext, exist := c.Get("user")
+	userContext, exist := c.Get("userId")
 	if !exist {
 		color.Danger.Println("失败了")
 	}
 	//查询用户组及该组的功能权限
-	user, ok := userContext.(models.User) //这个是类型推断,判断接口是什么类型
+	userId, ok := userContext.(string) //这个是类型推断,判断接口是什么类型
 	if !ok {
 
 		color.Danger.Println("断言失败")
 	}
-	helpers.JSON(c, http.StatusOK, "success", user)
+	sqlUser, _ := models.GetUserByUid(userId)
+	helpers.JSON(c, http.StatusOK, "success", sqlUser)
 }
 func UserIndex(c *gin.Context) {
 	users, _ := models.ListUsers()

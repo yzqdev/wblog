@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/gookit/color"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"io/ioutil"
@@ -104,10 +105,11 @@ func SigninPost(c *gin.Context) {
 		})
 		return
 	}
+	color.Redln(helpers.Md5(username + password))
 	user, err = models.GetUserByUsername(username)
 	if err != nil || user.Password != helpers.Md5(username+password) {
 		c.HTML(http.StatusOK, "auth/signin.html", gin.H{
-			"message": "invalid username or password",
+			"message": "用户名或者密码不合法",
 		})
 		return
 	}
