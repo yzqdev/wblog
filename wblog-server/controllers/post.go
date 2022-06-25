@@ -120,7 +120,7 @@ func PostPublish(c *gin.Context) {
 		res  = gin.H{}
 		post *models.Post
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	id := c.Param("id")
 	post, err = models.GetPostById(id)
 	if err != nil {

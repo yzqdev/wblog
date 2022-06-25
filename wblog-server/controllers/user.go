@@ -86,11 +86,11 @@ func SignupPost(c *gin.Context) {
 		color.Redln("解析json失败")
 	}
 	user := &models.User{
-		Uid:      xid.New().String(),
-		Email:    regUser.Email,
-		Username: regUser.Username,
-		Password: regUser.Password,
-		IsAdmin:  true,
+		Uid:       xid.New().String(),
+		Email:     regUser.Email,
+		Username:  regUser.Username,
+		Password:  regUser.Password,
+		AdminRole: true,
 	}
 	if len(user.Username) == 0 || len(user.Password) == 0 {
 		helpers.JSON(c, http.StatusOK, "username or password cannot be null", false)
@@ -132,7 +132,7 @@ func SigninPost(c *gin.Context) {
 		return
 	}
 
-	if user.IsAdmin {
+	if user.AdminRole {
 		expiresTime := time.Now().Unix() + int64(60*60*24)
 		//claims := jwt.StandardClaims{
 		//	Audience:  user.Username,          // 受众
@@ -217,7 +217,7 @@ func Oauth2Callback(c *gin.Context) {
 		user, _ = sessionUser.(*models.User)
 		_, err1 := models.IsGithubIdExists(userInfo.Login, user.Id)
 		if err1 != nil { // 未绑定
-			if user.IsAdmin {
+			if user.AdminRole {
 				user.GithubLoginId = userInfo.Login
 			}
 			user.AvatarUrl = userInfo.AvatarURL
@@ -247,7 +247,7 @@ func Oauth2Callback(c *gin.Context) {
 		s.Clear()
 		s.Set(helpers.SESSION_KEY, user.Id)
 		s.Save()
-		if user.IsAdmin {
+		if user.AdminRole {
 			c.Redirect(http.StatusMovedPermanently, "/admin/index")
 		} else {
 			c.Redirect(http.StatusMovedPermanently, "/")
@@ -343,7 +343,7 @@ func BindEmail(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	email := c.PostForm("email")
 	sessionUser, _ := c.Get(helpers.CONTEXT_USER_KEY)
 	user, ok := sessionUser.(*models.User)
@@ -373,7 +373,7 @@ func UnbindEmail(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	sessionUser, _ := c.Get(helpers.CONTEXT_USER_KEY)
 	user, ok := sessionUser.(*models.User)
 	if !ok {
@@ -397,7 +397,7 @@ func UnbindGithub(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	sessionUser, _ := c.Get(helpers.CONTEXT_USER_KEY)
 	user, ok := sessionUser.(*models.User)
 	if !ok {
@@ -445,7 +445,7 @@ func UserLock(c *gin.Context) {
 		res  = gin.H{}
 		user *models.User
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "true", res)
 	id := c.Param("id")
 	_id, err = strconv.ParseUint(id, 10, 64)
 	if err != nil {

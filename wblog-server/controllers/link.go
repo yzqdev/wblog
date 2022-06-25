@@ -57,7 +57,7 @@ func LinkUpdate(c *gin.Context) {
 		err   error
 		res   = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	id := c.Param("id")
 	name := c.PostForm("name")
 	url := c.PostForm("url")

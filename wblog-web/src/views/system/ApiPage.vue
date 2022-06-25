@@ -7,10 +7,11 @@
 <script setup>
 import {getProfileApi, updateProfileApi} from "@/utils/userApi";
 import {regApi} from "@/utils/apis";
+import {superIndexApi} from "@/utils/superApi";
 
  let resp=$ref()
  async function updateProfile(){
-   let res= await updateProfileApi({nickname:"sfdfssfd"})
+   let res= await superIndexApi()
    resp=res.data
  }
  async function reg(){
