@@ -52,7 +52,7 @@ func PostCreate(c *gin.Context) {
 		for _, tag := range tagArr {
 
 			pt := &models.PostTag{
-				PostId: post.ID,
+				PostId: post.Id,
 				TagId:  tag,
 			}
 			pt.Insert()
@@ -88,7 +88,7 @@ func PostUpdate(c *gin.Context) {
 		Body:        body,
 		IsPublished: published,
 	}
-	post.ID = id
+	post.Id = id
 	err := post.Update()
 	if err != nil {
 		helpers.JSON(c, http.StatusOK, "post/modify.html", gin.H{
@@ -98,14 +98,14 @@ func PostUpdate(c *gin.Context) {
 		return
 	}
 	// 删除tag
-	models.DeletePostTagByPostId(post.ID)
+	models.DeletePostTagByPostId(post.Id)
 	// 添加tag
 	if len(tags) > 0 {
 		tagArr := strings.Split(tags, ",")
 		for _, tag := range tagArr {
 
 			pt := &models.PostTag{
-				PostId: post.ID,
+				PostId: post.Id,
 				TagId:  tag,
 			}
 			pt.Insert()
@@ -148,7 +148,7 @@ func PostDelete(c *gin.Context) {
 		return
 	}
 	post := &models.Post{}
-	post.ID = id
+	post.Id = id
 	err = post.Delete()
 	if err != nil {
 		res["message"] = err.Error()
@@ -158,6 +158,16 @@ func PostDelete(c *gin.Context) {
 	res["succeed"] = true
 }
 
+// PingExample godoc
+// @Summary ping example
+// @Schemes
+// @Description do ping
+// @Tags example
+// @Accept json
+// @Security ApiKeyAuth
+// @Produce json
+// @Success 200 {string} Helloworld
+// @Router /home/posts [get]
 func PostIndex(c *gin.Context) {
 	posts, _ := models.ListAllPost("")
 	user, _ := c.Get(helpers.CONTEXT_USER_KEY)

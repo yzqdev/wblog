@@ -39,7 +39,7 @@ func IndexGet(c *gin.Context) {
 	}
 	policy = bluemonday.StrictPolicy()
 	for _, post := range posts {
-		post.Tags, _ = models.ListTagByPostId(post.ID)
+		post.Tags, _ = models.ListTagByPostId(post.Id)
 		post.Body = policy.Sanitize(string(blackfriday.MarkdownCommon([]byte(post.Body))))
 	}
 	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
@@ -57,6 +57,15 @@ func IndexGet(c *gin.Context) {
 	})
 }
 
+// PingExample godoc
+// @Summary ping example
+// @Schemes
+// @Description do ping
+// @Tags example
+// @Accept json
+// @Produce json
+// @Success 200 {string} Helloworld
+// @Router /admin/index [get]
 func AdminIndex(c *gin.Context) {
 	user, _ := c.Get(helpers.CONTEXT_USER_KEY)
 	helpers.JSON(c, http.StatusOK, "success", gin.H{

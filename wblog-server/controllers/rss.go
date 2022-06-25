@@ -30,9 +30,9 @@ func RssGet(c *gin.Context) {
 
 	for _, post := range posts {
 		item := &feeds.Item{
-			Id:          fmt.Sprintf("%s/post/%d", domain, post.ID),
+			Id:          fmt.Sprintf("%s/post/%d", domain, post.Id),
 			Title:       post.Title,
-			Link:        &feeds.Link{Href: fmt.Sprintf("%s/post/%d", domain, post.ID)},
+			Link:        &feeds.Link{Href: fmt.Sprintf("%s/post/%d", domain, post.Id)},
 			Description: string(post.Excerpt()),
 			Created:     now,
 		}

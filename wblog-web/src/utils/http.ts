@@ -3,7 +3,7 @@ import axios, { AxiosRequestConfig } from "axios";
 import { useUserStore } from "@/store/user";
 
 const instance = axios.create({
-  baseURL: "http://localhost:6090/v2", //接口统一域名
+  baseURL: "http://localhost:6090", //接口统一域名
   timeout: 60000, //设置超时
 });
 

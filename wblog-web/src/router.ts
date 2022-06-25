@@ -9,6 +9,7 @@ import NotFound from "./components/NotFound.vue";
 import Layout from "./layout/Index.vue";
 import Main from "./views/Main.vue";
 import LinkManage from "./views/system/LinkManage.vue";
+import ApiPage from "./views/system/ApiPage.vue";
 import PostManage from "./views/system/PostManage.vue";
 import CustomDirective from "./views/others/CustomDirective.vue";
 import Charts from "./views/others/Charts.vue";
@@ -41,7 +42,7 @@ let routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: "linkManage",
+        path: "link-manage",
         component: LinkManage,
         name: "linkManage",
         meta: {
@@ -49,9 +50,16 @@ let routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: "postManage",
+        path: "post-manage",
         component: PostManage,
         name: "postManage",
+        meta: {
+          title: "文章管理",
+        },
+      }, {
+        path: "api-page",
+        component: ApiPage,
+        name: "apiPage",
         meta: {
           title: "文章管理",
         },

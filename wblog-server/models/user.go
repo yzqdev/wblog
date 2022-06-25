@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/bwmarrin/snowflake"
 	"gorm.io/gorm"
 	"time"
 )
@@ -27,6 +28,8 @@ type User struct {
 // user
 // insert user
 func (user *User) Insert() error {
+	node, _ := snowflake.NewNode(1)
+	user.Id = node.Generate().String()
 	return DB.Create(user).Error
 }
 
@@ -66,7 +69,7 @@ func GetUserByUid(id interface{}) (*User, error) {
 }
 
 func (user *User) UpdateProfile(avatarUrl, nickName string) error {
-	return DB.Model(user).Updates(User{AvatarUrl: avatarUrl, Nickname: nickName}).Error
+	return DB.Model(user).Where("uid=?", user.Uid).Updates(User{AvatarUrl: avatarUrl, Nickname: nickName}).Error
 }
 
 func (user *User) UpdateEmail(email string) error {

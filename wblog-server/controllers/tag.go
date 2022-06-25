@@ -58,7 +58,7 @@ func TagGet(c *gin.Context) {
 	}
 	policy = bluemonday.StrictPolicy()
 	for _, post := range posts {
-		post.Tags, _ = models.ListTagByPostId(post.ID)
+		post.Tags, _ = models.ListTagByPostId(post.Id)
 		post.Body = policy.Sanitize(string(blackfriday.MarkdownCommon([]byte(post.Body))))
 	}
 	helpers.JSON(c, http.StatusOK, "success", gin.H{

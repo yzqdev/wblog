@@ -94,7 +94,7 @@ function addLinkBtnAction() {
 
 async function getLinks() {
   let data = await getLinksApi();
-  tableData = data.data;
+  tableData = data.data.links;
 }
 
 onMounted(async () => {

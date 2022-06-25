@@ -74,7 +74,7 @@ func CommentDelete(c *gin.Context) {
 	comment := &models.Comment{
 		UserID: uint(userId),
 	}
-	comment.ID = commentId
+	comment.Id = commentId
 	err = comment.Delete()
 	if err != nil {
 		res["message"] = err.Error()
@@ -100,7 +100,7 @@ func CommentRead(c *gin.Context) {
 		return
 	}
 	comment := new(models.Comment)
-	comment.ID = id
+	comment.Id = id
 	err = comment.Update()
 	if err != nil {
 		res["message"] = err.Error()

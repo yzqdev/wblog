@@ -13,7 +13,7 @@ import (
 
 const (
 	SESSION_KEY          = "UserID"       // session key
-	CONTEXT_USER_KEY     = "User"         // context user key
+	CONTEXT_USER_KEY     = "userId"       // context user key
 	SESSION_GITHUB_STATE = "GITHUB_STATE" // github state session key
 	SESSION_CAPTCHA      = "GIN_CAPTCHA"  // captcha session key
 )
@@ -69,7 +69,7 @@ func CreateXMLSitemap() {
 	if err == nil {
 		for _, post := range posts {
 			items = append(items, Item{
-				Loc:        fmt.Sprintf("%s/post/%d", domain, post.ID),
+				Loc:        fmt.Sprintf("%s/post/%d", domain, post.Id),
 				LastMod:    post.UpdatedAt,
 				Changefreq: "weekly",
 				Priority:   0.9,
@@ -81,7 +81,7 @@ func CreateXMLSitemap() {
 	if err == nil {
 		for _, page := range pages {
 			items = append(items, Item{
-				Loc:        fmt.Sprintf("%s/page/%d", domain, page.ID),
+				Loc:        fmt.Sprintf("%s/page/%d", domain, page.Id),
 				LastMod:    page.UpdatedAt,
 				Changefreq: "monthly",
 				Priority:   0.8,

@@ -6,19 +6,26 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/go-co-op/gocron"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
 	"html/template"
-	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
 	"time"
 	"wblog-server/controllers"
+	"wblog-server/docs"
 	"wblog-server/helpers"
 	"wblog-server/models"
+	"wblog-server/router"
 	"wblog-server/system"
 )
 
+// @title Swagger Example API
+// @version 0.0.1
+// @description This is a sample Server pets
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name x-token
+// @BasePath /v2
 func main() {
 
 	// 初始化zap日志库
@@ -30,11 +37,13 @@ func main() {
 	}
 
 	gin.SetMode(gin.DebugMode)
-	router := gin.Default()
-	setTemplate(router)
-	setSessions(router)
-	router.Use(SharedData())
-	router.Use(cors.New(cors.Config{
+	engine := gin.Default()
+	docs.SwaggerInfo.BasePath = "/v2"
+	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	//setTemplate(router)
+	setSessions(engine)
+	engine.Use(SharedData())
+	engine.Use(cors.New(cors.Config{
 		AllowAllOrigins:  true,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization", "token"},
@@ -53,11 +62,11 @@ func main() {
 
 	//router.Static("/static", "static")
 	//router.Static("/static", filepath.Join(getCurrentDirectory(), "./static"))
-	InitRouter(router)
-	InitRouterV2(router)
-	router.NoRoute(helpers.Handle404)
 
-	router.Run(system.GetConfiguration().Addr)
+	router.InitRouter(engine)
+	engine.NoRoute(helpers.Handle404)
+
+	engine.Run(system.GetConfiguration().Addr)
 }
 
 func setTemplate(engine *gin.Engine) {
@@ -75,7 +84,6 @@ func setTemplate(engine *gin.Engine) {
 
 	engine.SetFuncMap(funcMap)
 
-	engine.LoadHTMLGlob("views/**/*")
 }
 
 //setSessions initializes sessions & csrf middlewares
@@ -113,48 +121,3 @@ func SharedData() gin.HandlerFunc {
 		c.Next()
 	}
 }
-
-//AuthRequired grants access to authenticated users, requires SharedData middleware
-func AdminScopeRequired() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if user, _ := c.Get(helpers.CONTEXT_USER_KEY); user != nil {
-			if u, ok := user.(*models.User); ok && u.IsAdmin {
-				c.Next()
-				return
-			}
-		}
-		system.BlogLog.Warn("User not authorized to visit  " + c.Request.RequestURI)
-		helpers.JSON(c, http.StatusForbidden, "errors/error.html", gin.H{
-			"message": "Forbidden!",
-		})
-		c.Abort()
-	}
-}
-
-func AuthRequired() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if user, _ := c.Get(helpers.CONTEXT_USER_KEY); user != nil {
-			if _, ok := user.(*models.User); ok {
-				c.Next()
-				return
-			}
-		}
-		system.BlogLog.Warn("User not authorized to visit  " + c.Request.RequestURI)
-		helpers.JSON(c, http.StatusForbidden, "errors/error.html", gin.H{
-			"message": "Forbidden!",
-		})
-		c.Abort()
-	}
-}
-
-func getCurrentDirectory() string {
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		system.BlogLog.Error("warning", zap.Error(err))
-	}
-	return strings.Replace(dir, "\\", "/", -1)
-}
-
-//func getCurrentDirectory() string {
-//	return ""
-//}

@@ -18,6 +18,13 @@ type Mysql struct {
 	Pass string
 	Name string
 }
+type Pgsql struct {
+	Host   string
+	Port   string
+	User   string
+	Pass   string
+	Dbname string
+}
 type Zap struct {
 	Level         string
 	Format        string
@@ -54,9 +61,7 @@ type Configuration struct {
 	SmmsFileServer     string `mapstructure:"smms_fileserver"`
 	Zap                *Zap   `mapstructure:"zap"`
 	Mysql              *Mysql `mapstructure:"mysql"`
-	Pgsql              struct {
-		Pass string `mapstructure:"pass"`
-	}
+	Pgsql              *Pgsql `mapstructure:"pgsql"`
 }
 
 const (

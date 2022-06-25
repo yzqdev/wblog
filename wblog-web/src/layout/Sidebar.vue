@@ -52,6 +52,11 @@
             <pie-chart />
           </el-icon>
           <template #title>图表</template>
+        </el-menu-item>   <el-menu-item index="apiPage" @click="gotoRoute('apiPage')">
+          <el-icon>
+            <pie-chart />
+          </el-icon>
+          <template #title>api</template>
         </el-menu-item>
         <el-menu-item index="icons" @click="gotoRoute('icons')">
           <el-icon>

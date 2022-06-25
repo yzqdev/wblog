@@ -8,6 +8,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/gookit/color"
 	"github.com/pkg/errors"
+	"github.com/rs/xid"
 	"go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
@@ -57,6 +58,10 @@ type LoginUser struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
+type RegUser struct {
+	LoginUser
+	Email string `json:"email"`
+}
 type NewJwtClaims struct {
 	UserId string
 	jwt.StandardClaims
@@ -76,14 +81,15 @@ func SignupPost(c *gin.Context) {
 	var (
 		err error
 	)
-	loginUser := &LoginUser{}
-	if err = c.ShouldBindJSON(loginUser); err != nil {
+	regUser := &RegUser{}
+	if err = c.ShouldBindJSON(regUser); err != nil {
 		color.Redln("解析json失败")
 	}
 	user := &models.User{
-		Uid:      helpers.UUID(),
-		Username: loginUser.Username,
-		Password: loginUser.Password,
+		Uid:      xid.New().String(),
+		Email:    regUser.Email,
+		Username: regUser.Username,
+		Password: regUser.Password,
 		IsAdmin:  true,
 	}
 	if len(user.Username) == 0 || len(user.Password) == 0 {
@@ -209,7 +215,7 @@ func Oauth2Callback(c *gin.Context) {
 	sessionUser, exists := c.Get(helpers.CONTEXT_USER_KEY)
 	if exists { // 已登录
 		user, _ = sessionUser.(*models.User)
-		_, err1 := models.IsGithubIdExists(userInfo.Login, user.ID)
+		_, err1 := models.IsGithubIdExists(userInfo.Login, user.Id)
 		if err1 != nil { // 未绑定
 			if user.IsAdmin {
 				user.GithubLoginId = userInfo.Login
@@ -239,7 +245,7 @@ func Oauth2Callback(c *gin.Context) {
 	if err == nil {
 		s := sessions.Default(c)
 		s.Clear()
-		s.Set(helpers.SESSION_KEY, user.ID)
+		s.Set(helpers.SESSION_KEY, user.Id)
 		s.Save()
 		if user.IsAdmin {
 			c.Redirect(http.StatusMovedPermanently, "/admin/index")
@@ -297,9 +303,11 @@ func getGithubUserInfoByAccessToken(token string) (*GithubUserInfo, error) {
 
 func ProfileGet(c *gin.Context) {
 	sessionUser, exists := c.Get(helpers.CONTEXT_USER_KEY)
+	userId := sessionUser.(string)
+	sqlUser, _ := models.GetUserByUid(userId)
 	if exists {
 		helpers.JSON(c, http.StatusOK, "admin/profile.html", gin.H{
-			"user":     sessionUser,
+			"user":     sqlUser,
 			"comments": models.MustListUnreadComment(),
 		})
 	}
@@ -310,22 +318,24 @@ func ProfileUpdate(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+
 	avatarUrl := c.PostForm("avatarUrl")
-	nickName := c.PostForm("nickName")
+	nickName := c.PostForm("nickname")
 	sessionUser, _ := c.Get(helpers.CONTEXT_USER_KEY)
-	user, ok := sessionUser.(*models.User)
+	userId, ok := sessionUser.(string)
+	sqlUser, _ := models.GetUserByUid(userId)
 	if !ok {
 		res["message"] = "server interval error"
 		return
 	}
-	err = user.UpdateProfile(avatarUrl, nickName)
+	err = sqlUser.UpdateProfile(avatarUrl, nickName)
 	if err != nil {
 		res["message"] = err.Error()
 		return
 	}
 	res["succeed"] = true
-	res["user"] = models.User{AvatarUrl: avatarUrl, Nickname: nickName}
+	res["user"] = sqlUser
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 }
 
 func BindEmail(c *gin.Context) {
@@ -422,7 +432,6 @@ func UserInfo(c *gin.Context) {
 }
 func UserIndex(c *gin.Context) {
 	users, _ := models.ListUsers()
-	helpers.JSON(c, http.StatusOK, "获取成功", users)
 	helpers.JSON(c, http.StatusOK, "admin/user.html", gin.H{
 		"users":    users,
 		"comments": models.MustListUnreadComment(),

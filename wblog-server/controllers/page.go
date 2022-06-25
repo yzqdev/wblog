@@ -22,10 +22,6 @@ func PageGet(c *gin.Context) {
 	})
 }
 
-func PageNew(c *gin.Context) {
-	helpers.JSON(c, http.StatusOK, "page/new.html", nil)
-}
-
 func PageCreate(c *gin.Context) {
 	title := c.PostForm("title")
 	body := c.PostForm("body")
@@ -66,7 +62,7 @@ func PageUpdate(c *gin.Context) {
 	published := "on" == isPublished
 
 	page := &models.Page{Title: title, Body: body, IsPublished: published}
-	page.ID = id
+	page.Id = id
 	err := page.Update()
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -80,7 +76,7 @@ func PagePublish(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "ok", res)
 	id := c.Param("id")
 	page, err := models.GetPageById(id)
 	if err == nil {
@@ -105,7 +101,7 @@ func PageDelete(c *gin.Context) {
 	id := c.Param("id")
 
 	page := &models.Page{}
-	page.ID = id
+	page.Id = id
 	err = page.Delete()
 	if err != nil {
 		res["message"] = err.Error()
@@ -114,6 +110,14 @@ func PageDelete(c *gin.Context) {
 	res["succeed"] = true
 }
 
+// @Tags SysApi
+// @Summary 创建基础api
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body system.SysApi true "api路径, api中文描述, api组, 方法"
+// @Success 200 {object} response.Response{msg=string} "创建基础api"
+// @Router /api/createApi [post]
 func PageIndex(c *gin.Context) {
 	pages, _ := models.ListAllPage()
 	user, _ := c.Get(helpers.CONTEXT_USER_KEY)

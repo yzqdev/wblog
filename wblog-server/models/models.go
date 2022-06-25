@@ -4,13 +4,14 @@ import (
 	"github.com/gookit/color"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"time"
 	"wblog-server/system"
 )
 
 // BaseModel I don't need soft delete,so I use customized BaseModel instead gorm.Model
 type BaseModel struct {
-	ID        string    `json:"id" gorm:"type:varchar(64);primaryKey"`
+	Id        string    `json:"id" gorm:"type:varchar(64);primaryKey"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -54,7 +55,7 @@ func InitDB() (*gorm.DB, error) {
 	color.Redln(g.Mysql)
 	//dsn := g.Mysql.User + ":" + g.Mysql.Pass + "@tcp(127.0.0.1:3306)/" + g.Mysql.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
 	dsn := "host=localhost user=postgres password=" + g.Pgsql.Pass + " dbname=wblog port=5432 sslmode=disable TimeZone=Asia/Shanghai"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
 	if err == nil {
 		DB = db
 		//db.LogMode(true)
@@ -62,7 +63,6 @@ func InitDB() (*gorm.DB, error) {
 		//db.Model(&PostTag{}).AddUniqueIndex("uk_post_tag", "post_id", "tag_id")
 		return db, err
 	}
-	CreateAdmin()
 	return nil, err
 }
 

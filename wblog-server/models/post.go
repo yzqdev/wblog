@@ -25,7 +25,7 @@ type Post struct {
 
 // Post
 func (post *Post) Insert() error {
-	post.ID = xid.New().String()
+	post.Id = xid.New().String()
 	return DB.Create(post).Error
 }
 

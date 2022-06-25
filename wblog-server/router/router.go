@@ -1,4 +1,4 @@
-package main
+package router
 
 import (
 	"github.com/gin-gonic/gin"
@@ -9,37 +9,8 @@ import (
 	"wblog-server/system"
 )
 
-func InitRouterV2(router *gin.Engine) {
-	v2Router := router.Group("v2")
-	auth := v2Router.Group("/auth")
-	{
-		auth.POST("/login", controllers.SigninPost)
-		auth.POST("/reg", controllers.SignupPost)
-		auth.GET("/init", controllers.InitPage)
-
-	}
-	adminRouter := v2Router.Group("/admin", middleware.JwtHandler())
-	{
-		adminRouter.GET("/userInfo", controllers.UserInfo)
-		adminRouter.GET("/posts", controllers.PostIndex)
-		adminRouter.POST("/posts", controllers.PostCreate)
-		adminRouter.DELETE("/posts/:id", controllers.PostDelete)
-		adminRouter.GET("/links", controllers.LinkIndex)
-		adminRouter.POST("/link", controllers.LinkCreate)
-		adminRouter.DELETE("/link/:id", controllers.LinkDelete)
-		adminRouter.GET("/comment/unread", controllers.ListCommentUnRead)
-	}
-	homeRouter := v2Router.Group("/home")
-	{
-		homeRouter.GET("/posts", controllers.PostIndex)
-		homeRouter.GET("/post/:id", controllers.PostGet)
-		homeRouter.GET("/links", controllers.LinkIndex)
-
-		homeRouter.POST("/comment/:postId", controllers.CommentPost)
-	}
-
-}
 func InitRouter(router *gin.Engine) {
+
 	router.GET("/", controllers.IndexGet)
 	router.GET("/index", controllers.IndexGet)
 	router.GET("/rss", controllers.RssGet)
@@ -53,17 +24,6 @@ func InitRouter(router *gin.Engine) {
 	router.GET("/logout", controllers.LogoutGet)
 	router.GET("/oauth2callback", controllers.Oauth2Callback)
 	router.GET("/auth/:authType", controllers.AuthGet)
-
-	// captcha
-	router.GET("/captcha", controllers.CaptchaGet)
-
-	visitor := router.Group("/visitor")
-	visitor.Use(AuthRequired())
-	{
-		visitor.POST("/new_comment", controllers.CommentPost)
-		visitor.POST("/comment/:id/delete", controllers.CommentDelete)
-	}
-
 	// subscriber
 	router.GET("/subscribe", controllers.SubscribeGet)
 	router.POST("/subscribe", controllers.Subscribe)
@@ -76,9 +36,40 @@ func InitRouter(router *gin.Engine) {
 	router.GET("/archives/:year/:month", v2.ArchiveGet)
 
 	router.GET("/link/:id", controllers.LinkGet)
+	// captcha
+	router.GET("/captcha", controllers.CaptchaGet)
 
-	authorized := router.Group("/admin")
-	authorized.Use(AdminScopeRequired())
+	visitor := router.Group("/visitor")
+	visitor.Use(middleware.AuthRequired())
+	{
+		visitor.POST("/new_comment", controllers.CommentPost)
+		visitor.POST("/comment/:id/delete", controllers.CommentDelete)
+	}
+	auth := router.Group("/auth")
+	{
+		auth.POST("/login", controllers.SigninPost)
+		auth.POST("/reg", controllers.SignupPost)
+		auth.GET("/init", controllers.InitPage)
+
+	}
+	adminRouter := router.Group("/admin", middleware.JwtHandler())
+	{
+		adminRouter.GET("/userInfo", controllers.UserInfo)
+		adminRouter.GET("/posts", controllers.PostIndex)
+		adminRouter.POST("/posts", controllers.PostCreate)
+		adminRouter.DELETE("/posts/:id", controllers.PostDelete)
+		adminRouter.GET("/links", controllers.LinkIndex)
+		adminRouter.POST("/link", controllers.LinkCreate)
+		adminRouter.DELETE("/link/:id", controllers.LinkDelete)
+		adminRouter.GET("/comment/unread", controllers.ListCommentUnRead)
+
+		//user
+		adminRouter.GET("/profile", controllers.ProfileGet)
+		adminRouter.POST("/profile", controllers.ProfileUpdate)
+	}
+	//超级管理员
+	authorized := router.Group("/super")
+	authorized.Use(middleware.AdminScopeRequired())
 	{
 		// index
 		authorized.GET("/index", controllers.AdminIndex)
@@ -88,7 +79,6 @@ func InitRouter(router *gin.Engine) {
 
 		// page
 		authorized.GET("/page", controllers.PageIndex)
-		authorized.GET("/new_page", controllers.PageNew)
 		authorized.POST("/new_page", controllers.PageCreate)
 		authorized.GET("/page/:id/edit", controllers.PageEdit)
 		authorized.POST("/page/:id/edit", controllers.PageUpdate)
@@ -111,8 +101,7 @@ func InitRouter(router *gin.Engine) {
 		authorized.POST("/user/:id/lock", controllers.UserLock)
 
 		// profile
-		authorized.GET("/profile", controllers.ProfileGet)
-		authorized.POST("/profile", controllers.ProfileUpdate)
+
 		authorized.POST("/profile/email/bind", controllers.BindEmail)
 		authorized.POST("/profile/email/unbind", controllers.UnbindEmail)
 		authorized.POST("/profile/github/unbind", controllers.UnbindGithub)
@@ -138,6 +127,14 @@ func InitRouter(router *gin.Engine) {
 		// mail
 		authorized.POST("/new_mail", controllers.SendMail)
 		authorized.POST("/new_batchmail", controllers.SendBatchMail)
+	}
+	homeRouter := router.Group("/home")
+	{
+		homeRouter.GET("/posts", controllers.PostIndex)
+		homeRouter.GET("/post/:id", controllers.PostGet)
+		homeRouter.GET("/links", controllers.LinkIndex)
+
+		homeRouter.POST("/comment/:postId", controllers.CommentPost)
 	}
 
 }
