@@ -1,7 +1,14 @@
 package models
 
-import "testing"
+import (
+	"github.com/gookit/color"
+	"github.com/rs/xid"
+	"testing"
+)
 
 func TestCreateAdmin(t *testing.T) {
-	CreateAdmin()
+	uid := xid.New()
+	color.Redln(uid.Machine())
+	color.Redln(uid.Pid())
+	color.Redln(uid)
 }

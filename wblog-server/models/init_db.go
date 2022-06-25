@@ -15,7 +15,7 @@ func CreateAdmin() {
 		OutTime:       time.Now(),
 		GithubLoginId: "",
 		GithubUrl:     "",
-		IsAdmin:       true,
+		AdminRole:     true,
 		AvatarUrl:     "",
 		Nickname:      "admin",
 		LockState:     false,

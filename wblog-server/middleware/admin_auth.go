@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/gookit/color"
 	"go.uber.org/zap"
 	"net/http"
 	"os"
@@ -15,10 +16,13 @@ import (
 //AuthRequired grants access to authenticated users, requires SharedData middleware
 func AdminScopeRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if user, _ := c.Get(helpers.CONTEXT_USER_KEY); user != nil {
+		user, _ := c.Get(helpers.CONTEXT_USER_KEY)
+		color.Redln(`userid`, user)
+		if user != nil {
 			u, ok := user.(string)
+
 			sqlUser, _ := models.GetUserByUid(u)
-			if ok && sqlUser.IsAdmin {
+			if ok && sqlUser.AdminRole {
 				c.Next()
 				return
 			}

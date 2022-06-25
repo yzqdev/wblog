@@ -19,7 +19,7 @@ type User struct {
 	OutTime       time.Time `json:"out_time"`                                                        //过期时间
 	GithubLoginId string    `json:"githubLoginId" gorm:"type:varchar(64);unique_index;default:null"` // github唯一标识
 	GithubUrl     string    `json:"github_url" gorm:"type:varchar(64);"`                             //github地址
-	IsAdmin       bool      `json:"is_admin"`                                                        //是否是管理员
+	AdminRole     bool      `json:"admin_role"`                                                      //是否是管理员
 	AvatarUrl     string    `json:"avatar_url" gorm:"type:varchar(64);"`                             // 头像链接
 	Nickname      string    `json:"nickname" gorm:"type:varchar(64);"`                               // 昵称
 	LockState     bool      `json:"lock_state" gorm:"type:bool;default:false"`                       //锁定状态

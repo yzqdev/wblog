@@ -96,10 +96,3 @@ func CreateXMLSitemap() {
 		return
 	}
 }
-
-func WriteJson(ctx *gin.Context, h gin.H) {
-	if _, ok := h["succeed"]; !ok {
-		h["succeed"] = false
-	}
-	ctx.JSON(http.StatusOK, h)
-}

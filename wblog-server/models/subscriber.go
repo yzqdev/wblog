@@ -59,7 +59,7 @@ func GetSubscriberBySignature(key string) (*Subscriber, error) {
 	return &subscriber, err
 }
 
-func GetSubscriberById(id uint) (*Subscriber, error) {
+func GetSubscriberById(id string) (*Subscriber, error) {
 	var subscriber Subscriber
 	err := DB.First(&subscriber, id).Error
 	return &subscriber, err

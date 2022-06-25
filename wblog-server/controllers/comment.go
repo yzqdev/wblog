@@ -63,7 +63,7 @@ func CommentDelete(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 
 	s := sessions.Default(c)
 	sessionUserID := s.Get(helpers.SESSION_KEY)
@@ -93,7 +93,7 @@ func CommentRead(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	id = c.Param("id")
 	if err != nil {
 		res["message"] = err.Error()
@@ -114,7 +114,7 @@ func CommentReadAll(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	err = models.SetAllCommentRead()
 	if err != nil {
 		res["message"] = err.Error()

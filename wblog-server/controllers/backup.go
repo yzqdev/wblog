@@ -22,7 +22,7 @@ func BackupPost(c *gin.Context) {
 		err error
 		res = gin.H{}
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	err = Backup()
 	if err != nil {
 		res["message"] = err.Error()
@@ -40,7 +40,7 @@ func RestorePost(c *gin.Context) {
 		resp      *http.Response
 		bodyBytes []byte
 	)
-	defer helpers.WriteJson(c, res)
+	defer helpers.JSON(c, http.StatusOK, "success", res)
 	fileName = c.PostForm("fileName")
 	if fileName == "" {
 		res["message"] = "fileName cannot be empty."

@@ -68,8 +68,7 @@ func InitRouter(router *gin.Engine) {
 		adminRouter.POST("/profile", controllers.ProfileUpdate)
 	}
 	//超级管理员
-	authorized := router.Group("/super")
-	authorized.Use(middleware.AdminScopeRequired())
+	authorized := router.Group("/super", middleware.JwtHandler(), middleware.AdminScopeRequired())
 	{
 		// index
 		authorized.GET("/index", controllers.AdminIndex)

@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"github.com/rs/xid"
+	"time"
+)
 
 // Link
 // table link
@@ -14,6 +17,7 @@ type Link struct {
 }
 
 func (link *Link) Insert() error {
+	link.Id = xid.New().String()
 	return DB.FirstOrCreate(link, "url = ?", link.Url).Error
 }
 

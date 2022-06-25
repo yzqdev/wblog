@@ -5,8 +5,6 @@ import (
 	"strings"
 	"wblog-server/helpers"
 
-	"strconv"
-
 	"github.com/gin-gonic/gin"
 	"wblog-server/models"
 )
@@ -15,7 +13,6 @@ func SendMail(c *gin.Context) {
 	var (
 		err        error
 		res        = gin.H{}
-		uid        uint64
 		subscriber *models.Subscriber
 	)
 	defer helpers.JSON(c, http.StatusOK, "success", res)
@@ -27,12 +24,12 @@ func SendMail(c *gin.Context) {
 		res["message"] = "error parameter"
 		return
 	}
-	uid, err = strconv.ParseUint(userId, 10, 64)
+
 	if err != nil {
 		res["message"] = err.Error()
 		return
 	}
-	subscriber, err = models.GetSubscriberById(uint(uid))
+	subscriber, err = models.GetSubscriberById(userId)
 	if err != nil {
 		res["message"] = err.Error()
 		return
